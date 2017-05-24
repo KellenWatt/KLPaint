@@ -1,8 +1,99 @@
-.redbox {
-    width: 200px;
-    height: 200px;
-    background-color: red;
+.frame {
+    background-color: #333;
+}
+
+.titlebar {
+    display: flex;
+    height: 3em;
+    align-content: center;
+    justify-content: center;
+    border-bottom: 0.1em solid #222;
+}
+
+.title-item:hover {
+    background-color: rgba(200,200,200,0.5);
+}
+
+.title-item > img {
+    max-height: 3em;
+    padding: 0.3em;
+}
+
+.title-right {
+    border-right: 0.1em solid #EEE;
+}
+
+.title {
+    flex: 1;
+    color: white;
     display: flex;
     justify-content: center;
+    -ms-align-items: center;
     align-items: center;
+    font-family: Arial Black, Arial, sans-serif;
+}
+
+.title-left {
+    border-left: 0.1em solid #EEE;
+}
+
+.toolbar {
+    width: 10em;
+    min-height: 20em;
+    border-top: 0.1em solid #444;
+}
+
+.tool {
+    border: 0.1em solid #555;
+    border-radius: 4px;
+    background-color:#333
+}
+
+.toolbox {
+    overflow: hidden;
+    margin: 0.75em;
+}
+
+.toolbox input {
+    position: absolute;
+    clip: rect(0,0,0,0);
+    height: 1px;
+    width: 1px;
+    border: 0;
+    overflow: hidden;
+}
+
+.toolbox label {
+    float: left;
+    display: inline-block;
+    background-color: #555;
+    color: rgba(0,0,0,0.6);
+    text-align: center;
+    text-shadow: none;
+    padding: 0.25em 0.25em;
+    border: 0.05em solid rgba(0,0,0,0.2);
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+.toolbox input:checked + label {
+    background-color: #333;
+    -webkit-box-shadow: inset 0 1px 3px rgba(0,0,0,0.3), 0 1px rgba(255,255,255,0.1);
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.3), 0 1px rgba(255,255,255,0.1);
+}
+
+label > img {
+    height: 1em;
+}
+
+.toolbox label:nth-of-type(5n+1) {
+    border-radius: 0.375em 0 0 0.375em;
+}
+
+.toolbox label:nth-of-type(5n) {
+    border-radius: 0 4px 4px 0;
+}
+
+.toolbox label:nth-of-type(-n+5) {
+    margin-bottom: 0.5em;
 }
