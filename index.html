@@ -6,21 +6,29 @@
 </head>
 <body>
     <header class="titlebar frame">
-        <div class="title-item title-right">
+        <div class="title-item title-left">
             <img src="assets/images/tools.png" alt="Tools">
         </div>
-        <div class="title-item title-right">
+        <div class="title-item title-left">
             <img src="assets/images/save.png" alt="Save">
         </div>
+        <div class="title-padding"></div>
+        <div class="title-padding"></div>
         <div class="title">KL Paint</div>
-        <div class="title-item title-left">
+        <div class="title-item title-right">
+            <img src="assets/images/undo.png" alt="undo" />
+        </div>
+        <div class="title-item title-right">
+            <img src="assets/images/redo.png" alt="redo" />
+        </div>
+        <div class="title-item title-right">
             <img src="assets/images/layers.png" alt="Layers">
         </div>
-        <div class="title-item title-left">
+        <div class="title-item title-right">
             <img src="assets/images/history.png" alt="History">
         </div>
     </header>
-    <section class="toolbar frame">
+    <div class="toolbar frame">
         <div class="toolbox">
             <input type="radio" id="pencil" name="tool-selection" value="pencil" checked>
             <label for="pencil"><img src="assets/images/pencil.png" alt="pencil"></label>
@@ -51,6 +59,22 @@
 
             <input type="radio" id="image" name="tool-selection" value="image">
             <label for="image"><img src="assets/images/image.png" alt="image"></label>
+            <div class="color">
+                <div class="color-selection" id="primary-color"></div>
+                <div class="color-selection" id="secondary-color"></div>
+            </div>
+        </div>
+    </div>
+    <section id="drawspace">
+        <canvas></canvas>
     </section>
+    <div class="sidebar frame">
+        <div class="layers">
+            <div id="layer-list"></div>
+        </div>
+        <div class="history">
+
+        </div>
+    </div>
 </body>
 </html>

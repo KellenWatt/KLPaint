@@ -1,5 +1,8 @@
+/*body * {border: 1px solid red;}*/
+
 .frame {
     background-color: #333;
+    color: white;
 }
 
 .titlebar {
@@ -19,13 +22,19 @@
     padding: 0.3em;
 }
 
-.title-right {
+.title-left {
     border-right: 0.1em solid #EEE;
+}
+
+.title-padding {
+    max-height: 3em;
+    max-width: 3em;
+    width: 3em;
+    padding: 0.3em;
 }
 
 .title {
     flex: 1;
-    color: white;
     display: flex;
     justify-content: center;
     -ms-align-items: center;
@@ -33,14 +42,17 @@
     font-family: Arial Black, Arial, sans-serif;
 }
 
-.title-left {
+.title-right {
     border-left: 0.1em solid #EEE;
 }
 
 .toolbar {
+    position: absolute;
     width: 10em;
-    min-height: 20em;
+    height: auto;
     border-top: 0.1em solid #444;
+    display: flex;
+    justify-content: center;
 }
 
 .tool {
@@ -52,15 +64,19 @@
 .toolbox {
     overflow: hidden;
     margin: 0.75em;
+    order: 0;
+    padding-top: 1em;
+    padding-bottom: 1em;
 }
 
 .toolbox input {
-    position: absolute;
+    position: relative;
     clip: rect(0,0,0,0);
     height: 1px;
     width: 1px;
     border: 0;
     overflow: hidden;
+    display:none;
 }
 
 .toolbox label {
@@ -96,4 +112,62 @@ label > img {
 
 .toolbox label:nth-of-type(-n+5) {
     margin-bottom: 0.5em;
+}
+
+.color {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.color-selection {
+    width: 3em;
+    height: 1.5em;
+    margin: 0.5em 0.25em 0.25em 0.25em;
+    border:2px outset lightgrey;
+    order: 2;
+}
+
+.color-selection:hover {
+    border: 2px inset lightgrey
+}
+
+#primary-color {
+    background-color: black;
+}
+#secondary-color {
+    background-color: white;
+}
+
+#drawspace {
+    position:absolute;
+    top: 3em;
+    width:100%;
+    height: calc(100% - 3em);
+    overflow: hidden;
+    border: 1px solid blue;
+    z-index: -1;
+}
+
+.sidebar {
+    position: absolute;
+    top: 3em;
+    right: 0;
+    width: 15em;
+    height: calc(100% - 3em);
+    display: flex;
+    flex-direction: column;
+    border: 1px solid green;
+}
+
+.layers {
+    order = 0;
+    height: 40%;
+    border: 1px solid red;
+}
+
+.history {
+    order = 5;
+    height: 60%;
+    border: 1px solid yellow;
 }
