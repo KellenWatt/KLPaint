@@ -66,14 +66,41 @@
         </div>
     </div>
     <section id="drawspace">
-        <canvas></canvas>
+        <canvas class="layer"></canvas>
     </section>
     <div class="sidebar frame">
         <div class="layers">
-            <div id="layer-list"></div>
+            <ul class="layer-list">
+                <li class="layer-list-item">
+                    <img src="assets/images/visible.png" alt="visible">
+                    example layer
+                </li>
+                <li class="layer-list-item">
+                    <img src="assets/images/visible.png" alt="visible">
+                    example layer 2
+                </li>
+                <li class="layer-list-item new-layer">
+                    <img src="assets/images/add.png" alt="add layer">
+                </li>
+            </ul>
         </div>
-        <div class="history">
-
+        <div class="layer-history">
+            <ul class="history-tree">
+                <li class="history-level">
+                    <div class="history-node">
+                        action
+                    </div>
+                </li>
+                <li class="history-level">
+                    <div class="history-node"> action </div>
+                    <div class="history-node"> replacement</div>
+                </li>
+                <li class="history-level">
+                    <div class="history-node">action</div>
+                    <div class="history-node">replacement</div>
+                    <div class="history-node">replacement</div>
+                </li>
+            </ul>
         </div>
     </div>
 </body>
