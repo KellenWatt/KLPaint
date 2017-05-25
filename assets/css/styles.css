@@ -69,7 +69,7 @@
     padding-bottom: 1em;
 }
 
-.toolbox input {
+.toolbox input[type="radio"] {
     position: relative;
     clip: rect(0,0,0,0);
     height: 1px;
@@ -79,7 +79,7 @@
     display:none;
 }
 
-.toolbox label {
+.toolbox input[type="radio"] + label {
     float: left;
     display: inline-block;
     background-color: #555;
@@ -102,15 +102,15 @@
     height: 1em;
 }
 
-.toolbox label:nth-of-type(5n+1) {
+.toolbox input[type="radio"] + label:nth-of-type(5n+1) {
     border-radius: 0.375em 0 0 0.375em;
 }
 
-.toolbox label:nth-of-type(5n) {
+.toolbox input[type="radio"] + label:nth-of-type(5n) {
     border-radius: 0 4px 4px 0;
 }
 
-.toolbox label:nth-of-type(-n+5) {
+.toolbox input[type="radio"] + label:nth-of-type(-n+5) {
     margin-bottom: 0.5em;
 }
 
@@ -146,6 +146,25 @@
     height: calc(100% - 3em);
     overflow: hidden;
     z-index: -1;
+    border: 1px solid blue;
+}
+
+.brush-size {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.3em
+}
+
+.brush-size > label {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.75em;
+    margin-right: 0.3em;
+}
+
+.brush-size > input {
+    width: 4em;
+    height: 1.3em;
 }
 
 .sidebar {
