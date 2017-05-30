@@ -1,24 +1,28 @@
-window.onload = function() {
+window.addEventListener("load", function() {
+
     var palette = document.getElementById("palette");
     var toolbar = document.getElementById("toolbar");
     var layerPanel = document.getElementById("layers-panel");
-    var layers = document.getElementById("layers");
+    var layerPane = document.getElementById("layers");
     var historyPanel = document.getElementById("history-panel");
     var history = document.getElementsByClassName("layer-history")[0];
+    var createLayerButton = document.getElementById("create-layer");
+    var layerList = document.getElementById("layer-list");
+    var toolbox = document.getElementsByClassName("toolbox")[0];
 
-    var selectedLayer;
+    var selectedLayer = null;
+    var currentTool = "pencil";
+    var layers = [];
 
-    palette.addEventListener("click", function(e) {
-        toolbar.style.display = (toolbar.style.display == "none" ? "flex" : "none");
-    });
+    function toggleShow(e) {
+        e.target.style.display = (e.target.display == "none" ? "flex" : "none");
+    }
 
-    layerPanel.addEventListener("click", function(e) {
-        layers.style.display = (layers.style.display == "none" ? "flex" : "none");
-    });
+    palette.addEventListener("click", toggleShow);
 
-    historyPanel.addEventListener("click", function(e) {
-        history.style.display = (history.style.display == "none" ? "flex" : "none");
-    });
+    layerPanel.addEventListener("click", toggleShow);
+
+    historyPanel.addEventListener("click", toggleShow);
 
     var kaboom = document.getElementById("clear-screen");
     kaboom.addEventListener("click", function () {
@@ -33,39 +37,53 @@ window.onload = function() {
     });
 
 
-    var createLayerButton = document.getElementById("create-layer");
-    var layerList = document.getElementById("layer-list");
-    var layerCount = 1;
     createLayerButton.addEventListener("click", function() {
-        // TODO: Add canvas;
+        layers.push(new Layer(layers.length));
+
         var newLayer = document.createElement("li");
         newLayer.className = "layer-list-item";
         newLayer.id = "layer" + layerCount;
         var img = document.createElement("img");
         img.src = "assets/images/visible.png";
         newLayer.appendChild(img);
-        newLayer.innerHTML = newLayer.innerHTML + "Layer" + layerCount++;
+        newLayer.innerHTML = newLayer.innerHTML + "Layer" + layerCount;
         newLayer.addEventListener("click", function(e) {
             // TODO: integrate canvas selection;
             if(selectedLayer) {
-                document.getElementById(selectedLayer).style.backgroundColor = "#999";
+                document.getElementById("layer"+selectedLayer).style.backgroundColor = "#999";
             }
-            selectedLayer = this.id;
+            document.getElementsByClassName("toolbox")[0]
+            selectedLayer = this.id.slice(5,-1);
+            console.log(selectedLayer);
             this.style.backgroundColor = "lightgrey";
         });
         layerList.insertBefore(newLayer, layerList.childNodes[-1]);
+        //Add canvas with same id# as layer
+        var newCanvas = document.createElement("canvas");
+        newCanvas.className = "layer-list";
+        newCanvas.id = "canvas" + layerCount;
+        document.getElementById("drawspace").appendChild(newCanvas);
+        layerCount++;
     });
 
     var deleteLayerButton = document.getElementById("delete-layer");
     deleteLayerButton.addEventListener("click", function () {
         // TODO: remove canvas;
         if(selectedLayer){
-            layerList.removeChild(document.getElementById(selectedLayer));
+            layerList.removeChild(document.getElementById("layer"+selectedLayer));
             selectedLayer = null;
             // TODO: MAYBE: highlight previous layer
         }
     });
 
 
+    var tools = toolbox.children;
+    for(var i=0; i < tools.length; i++) {
+        tools[i].addEventListener("click", function(e) {
+            currentTool = this.value;
+            console.log(currentTool);
+        });
+    }
 
-};
+
+});
