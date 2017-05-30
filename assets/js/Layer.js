@@ -36,10 +36,14 @@
 
 var Layer = (function() {
     var id;
+    var name;
     var canvas;
 
-    function Layer(lid) {
+    function Layer(lid, name = null) {
         this.id = lid;
+        if(!name) {
+            name = lid;
+        }
         this.canvas = new Canvas(lid);
     }
 
