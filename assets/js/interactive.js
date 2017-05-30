@@ -13,16 +13,19 @@ window.addEventListener("load", function() {
     var selectedLayer = null;
     var currentTool = "pencil";
     var layers = [];
+    var layerID = 0;
 
-    function toggleShow(e) {
-        e.target.style.display = (e.target.display == "none" ? "flex" : "none");
-    }
+    palette.addEventListener("click", function(e) {
+        toolbar.style.display = (toolbar.style.display == "none" ? "flex" : "none");
+    });
 
-    palette.addEventListener("click", toggleShow);
+    layerPanel.addEventListener("click", function(e) {
+        layerPane.style.display = (layerPane.style.display == "none" ? "flex" : "none");
+    });
 
-    layerPanel.addEventListener("click", toggleShow);
-
-    historyPanel.addEventListener("click", toggleShow);
+    historyPanel.addEventListener("click", function(e) {
+        history.style.display = (history.style.display == "none" ? "flex" : "none");
+    });
 
     var kaboom = document.getElementById("clear-screen");
     kaboom.addEventListener("click", function () {
@@ -38,7 +41,7 @@ window.addEventListener("load", function() {
 
 
     createLayerButton.addEventListener("click", function() {
-        layers.push(new Layer(layers.length));
+        layers.push(new Layer(layerID++));
 
         var newLayer = document.createElement("li");
         newLayer.className = "layer-list-item";
