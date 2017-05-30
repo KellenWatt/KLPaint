@@ -3,6 +3,9 @@
 <head>
     <link rel="stylesheet" type="text/css" href="assets/css/reset.css">
     <link rel="stylesheet" type="text/css" href="assets/css/styles.css">
+
+    <script type="text/javascript" src="assets/js/interactive.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </head>
 <body>
     <header class="titlebar frame">
@@ -30,7 +33,7 @@
             <img src="assets/images/history.png" alt="History">
         </div>
     </header>
-    <div class="toolbar frame">
+    <div class="toolbar frame" id="toolbar">
         <div class="toolbox">
             <input type="radio" id="pencil" name="tool-selection" value="pencil" checked>
             <label for="pencil"><img src="assets/images/pencil.png" alt="pencil"></label>
@@ -75,19 +78,12 @@
         <canvas class="layer"></canvas>
     </section>
     <div class="sidebar frame">
-        <div class="layers">
-            <ul class="layer-list">
+        <div class="layers" id="layers">
+            <ul class="layer-list" id="layer-list">
                 <!-- Examples -->
-                <li class="layer-list-item">
-                    <img src="assets/images/visible.png" alt="visible">
-                    example layer
-                </li>
-                <li class="layer-list-item">
-                    <img src="assets/images/visible.png" alt="visible">
-                    example layer 2
-                </li>
-                <!-- End Examples -->
 
+                <!-- End Examples -->
+                <!-- TODO: Move these outside the list; -->
                 <li class="layer-list-item new-layer">
                     <div class="layer-action" id="create-layer">
                         <img src="assets/images/add.png" alt="add layer">
@@ -98,7 +94,7 @@
                 </li>
             </ul>
         </div>
-        <div class="layer-history">
+        <div class="layer-history" id="history">
             <ul class="history-tree">
                 <!-- Examples -->
                 <li class="history-level">
