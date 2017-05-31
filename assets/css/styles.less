@@ -8,15 +8,22 @@
 @tool-grey: #555;
 @title-shade: rgba(200,200,200,0.5);
 @grey: #999;
+@lightgrey: lightgrey;
 @shady-white: #EEE;
 
 @title-size: 3em;
 @title-pad: 0.3em;
 
-@content-height: calc(100% - @title-size);
+@content-height: calc(~"100% - "@title-size);
 @sidebar-item-width: 12em;
 
+@entry-height: 1.5em;
+
 @site-fonts: Arial, Helvetica, sans-serif;
+
+.dummy {
+    font-size: 100% - 3;
+}
 
 .flex {
     display: flex;
@@ -46,9 +53,17 @@
     border-top: 1px solid @medium-grey;
 }
 
-// .box-shadow(...) {
-//     box-shadow: @arguments
-// }
+.border(cl) {
+    border: 1px solid @cl;
+}
+
+.entry {
+    background-color: @grey;
+    border-bottom: 1px solid @medium-grey;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 
 /* End Less definitions */
 
@@ -56,13 +71,6 @@
     background-color: @theme-grey;
     color: white;
 }
-
-// .titlebar {
-//     .flex-hcenter;
-//     align-content: center;
-//     height: @title-size;
-//     .bottom-edge;
-// }
 
 .title-item {
     &:hover {
@@ -103,28 +111,6 @@
         border-left: 2px solid @shady-white;
     }
 }
-
-// .title-left {
-//     border-right: 2px solid @shady-white;
-// }
-//
-// .title-padding {
-//     max-height: @title-size;
-//     max-width: @title-size;
-//     width: @title-size;
-//     padding: @title-pad;
-// }
-
-// .title {
-//     flex: 1; /* occupy remaining space */
-//     .flex-center;
-//     font-family: Arial Black, Arial, sans-serif;
-//     font-size: 1.5em;
-// }
-
-// .title-right {
-//     border-left: 2px solid @shady-white;
-// }
 
 .toolbar {
     position: absolute;
@@ -192,80 +178,22 @@
 
 }
 
-// .toolbox input[type="radio"] {
-//     position: relative;
-//     clip: rect(0,0,0,0);
-//     height: 1px;
-//     width: 1px;
-//     border: 0;
-//     overflow: hidden;
-//     display:none;
-// }
-
-// .toolbox input[type="radio"] + label {
-//     float: left;
-//     display: inline-block;
-//     background-color: #555;
-//     color: rgba(0,0,0,0.6);
-//     text-align: center;
-//     text-shadow: none;
-//     padding: 0.25em 0.25em;
-//     border: 0.05em solid rgba(0,0,0,0.2);
-//     -webkit-box-shadow: none;
-//     box-shadow: none;
-// }
-
-// .toolbox input:checked + label {
-//     background-color: #333;
-//     -webkit-box-shadow: inset 0 1px 3px rgba(0,0,0,0.3), 0 1px rgba(255,255,255,0.1);
-//     box-shadow: inset 0 1px 3px rgba(0,0,0,0.3), 0 1px rgba(255,255,255,0.1);
-// }
-
-// .toolbox > label > img {
-//     height: 1em;
-// }
-
-// .toolbox input[type="radio"] + label:nth-of-type(5n+1) {
-//     border-radius: 0.375em 0 0 0.375em;
-// }
-//
-// .toolbox input[type="radio"] + label:nth-of-type(5n) {
-//     border-radius: 0 4px 4px 0;
-// }
-//
-// .toolbox input[type="radio"] + label:nth-of-type(-n+5) {
-//     margin-bottom: 0.5em;
-// }
-
 .color {
     width: 100%;
-    display: flex;
-    justify-content: center;
+    .flex-hcenter;
 
     &-selection {
         width: 3em;
         height: 1.5em;
         margin: 0.5em 0.25em 0.25em 0.25em;
-        border:2px outset lightgrey;
+        border:2px outset @lightgrey;
         order: 2;
 
         &:hover {
-            border: 2px inset lightgrey;
+            border: 2px inset @lightgrey;
         }
     }
 }
-
-// .color-selection {
-//     width: 3em;
-//     height: 1.5em;
-//     margin: 0.5em 0.25em 0.25em 0.25em;
-//     border:2px outset lightgrey;
-//     order: 2;
-// }
-
-// .color-selection:hover {
-//     border: 2px inset lightgrey
-// }
 
 #primary-color {
     background-color: black;
@@ -278,14 +206,12 @@
     position: absolute;
     top: @title-size;
     width: 100%;
-    height: calc(100% - 3em);
+    height: @content-height;
     overflow: hidden;
     z-index: -1;
-    /*border: 1px solid blue;*/
 }
 
 .layer {
-    /*border: 1px solid limegreen;*/
     width: 100%;
     height: 100%;
 }
@@ -305,17 +231,6 @@
         height: 1.3em;
     }
 }
-
-// .brush-size > label {
-//     font-family: Arial, Helvetica, sans-serif;
-//     font-size: 0.75em;
-//     margin-right: 0.3em;
-// }
-//
-// .brush-size > input {
-//     width: 4em;
-//     height: 1.3em;
-// }
 
 .sidebar {
     position: absolute;
@@ -348,7 +263,7 @@
     font-size: 0.9em;
     .flex-vcenter;
     background-color: @grey;
-    height: 1.5em;
+    height: @entry-height;
     max-width: 100%;
     border-bottom: 1px solid @medium-grey;
     overflow: hidden;
@@ -357,7 +272,7 @@
     color: black;
 
     &:hover {
-        background-color: lightgrey !important;
+        background-color: @lightgrey !important;
     }
 
     &:first {
@@ -372,24 +287,9 @@
     }
 }
 
-// .layer-list-item:hover {
-//     background-color: lightgrey !important;
-// }
-
-// .layer-list-item:first {
-//     border-top: none;
-// }
-//
-// .layer-list-item > img {
-//     max-height: 100%;
-//     width: auto;
-//     margin-right: 0.4em;
-//     margin-left: 0.2em;
-// }
-
-.new-layer {
+.layer-controls {
     position: absolute;
-    bottom: -1.5em;
+    bottom: -@entry-height;
     right: 0;
     left: 0;
     .flex-vcenter;
@@ -399,18 +299,6 @@
         background-color: @grey;
     }
 }
-
-// .new-layer:hover {
-//     background-color: @grey;
-// }
-
-// .layer-action:first-child {
-//     border-right: 1px solid @medium-grey;
-// }
-
-// .layer-action:hover {
-//     background-color: lightgrey;
-// }
 
 .layer-action {
     display: inherit;
@@ -424,17 +312,13 @@
     }
 
     &:hover {
-        background-color: lightgrey;
+        background-color: @lightgrey;
     }
 
     & > img {
         height: 100%;
     }
 }
-
-// .layer-action > img {
-//     height: 100%;
-// }
 
 .layer-history {
     order:5;
@@ -453,9 +337,9 @@
 .history-level {
     font-family: @site-fonts;
     font-size: 0.9em;
-    .flex-vcenter
+    .flex-vcenter;
     background-color: @grey;
-    height: 1.5em;
+    height: @entry-height;
     max-width: 100%;
     border-bottom: 1px solid @tool-grey;
     color: black;
@@ -463,7 +347,7 @@
 
 .history-node {
     height: 100%;
-    line-height: 1.5em;
+    line-height: @entry-height;
     background-color: @grey;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -472,18 +356,10 @@
     border-right: 1px solid @tool-grey;
 
     &:hover {
-        background-color: lightgrey;
+        background-color: @lightgrey;
     }
 
     &:last-child {
         border: none;
     }
 }
-
-// .history-node:hover {
-//     background-color: lightgrey;
-// }
-//
-// .history-node:last-child {
-//     border: none;
-// }
