@@ -49,6 +49,24 @@ var Layer = (function() {
 
     Layer.prototype.remove = function() {
         this.id = -1;
+        this.canvas = null;
+        this.name = null;
+    }
+
+    Layer.prototype.getID() {
+        return this.id;
+    }
+
+    Layer.prototype.getName() {
+        return this.name;
+    }
+
+    Layer.prototaype.setName(str) {
+        this.name = str;
+    }
+
+    Layer.prototype.getCanvas() {
+        return this.canvas;
     }
 
     return Layer;
