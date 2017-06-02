@@ -59,7 +59,7 @@
 
             <input type="radio" id="eraser" name="tool-selection" value="eraser">
             <label for="eraser"><img src="assets/images/eraser.png" alt="eraser"></label>
-            
+
             <input type="radio" id="dropper" name="tool-selection" value="dropper">
             <label for="dropper"><img src="assets/images/dropper.png" alt="dropper"></label>
 
@@ -69,17 +69,17 @@
             <input type="radio" id="image" name="tool-selection" value="image">
             <label for="image"><img src="assets/images/image.png" alt="image"></label>
             <div class="color">
-                <div class="color-selection" id="primary-color"></div>
-                <div class="color-selection" id="secondary-color"></div>
+                <input type="color" class="color-selection" id="primary-color" />
+                <input type="color" class="color-selection" id="secondardy-color" />
             </div>
             <div class="brush-size">
                 <label for="brush-size">Stroke:</label>
                 <input type="number" name="brush-size" min="1" id="brush-size" value="10"/>
             </div>
-            <div class="antialias">
+            <!-- <div class="antialias">
                 <input type="checkbox" name="antialias" id="antialias" checked />
                 <label for="antialias">Anti-alias</label>
-            </div>
+            </div> -->
             <div class="antialias">
                 <input type="checkbox" name="fill" id="fill">
                 <label for="fill">Fill</label>
@@ -87,6 +87,7 @@
         </div>
     </div>
     <section id="drawspace">
+        <canvas class="layer" id="worker"></canvas>
         <!-- <canvas class="layer" id=""></canvas> -->
     </section>
     <div class="sidebar frame">
