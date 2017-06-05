@@ -34,23 +34,45 @@
 //
 // }
 
+var History = (function() {
+    var root;
+
+    var HistoryNode = (function() {
+        var action;
+
+        function HistoryNode(action) {
+            this.action = action;
+        }
+
+        return HistoryNode;
+    }());
+
+    function History() {
+        this.root = new HistoryNode();
+    }
+
+    return History;
+}());
+
+
 var Layer = (function() {
     var id;
     var name;
     var canvas;
+    var _context;
+    var history;
 
-    function Layer(lid, name = null) {
+    function Layer(lid, canvas, name = null) {
         this.id = lid;
-        if(!name) {
-            name = lid;
-        }
-        this.canvas = new Canvas(lid);
+        this.canvas = canvas;
+        this._context = canvas.getContext("2d");
+        this.name = name;
     }
 
     Layer.prototype.remove = function() {
         this.id = -1;
-        this.canvas = null;
         this.name = null;
+        this.canvas = null;
     }
 
     Layer.prototype.getID() {
@@ -58,7 +80,11 @@ var Layer = (function() {
     }
 
     Layer.prototype.getName() {
-        return this.name;
+        if(this.name) {
+            return this.name;
+        }else {
+            return "Layer"+this.id;
+        }
     }
 
     Layer.prototaype.setName(str) {
@@ -68,6 +94,18 @@ var Layer = (function() {
     Layer.prototype.getCanvas() {
         return this.canvas;
     }
+
+    Layer.prototype.getCanvasContext() {
+        return this._context;
+    }
+
+    Layer.prototype.finalize() {
+        this.id = -1;
+        this.name = null,
+        this.canvas = null;
+    }
+
+
 
     return Layer;
 }());
