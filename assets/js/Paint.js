@@ -11,6 +11,7 @@ var Paint = (function(document) {
     var fill = false;
 
     var image;
+    var textBox;
 
     var _layerid = 0;
 
@@ -27,6 +28,7 @@ var Paint = (function(document) {
 
     // require pass dom element, check if canvas, else create canvas as child.
     // Also, default argument aren't a valid thing
+    // refactor primary/secondary to take DOM colorpicker
     function Paint(canvas, weight = 10, primary = "black", secondary = "white") {
 
         this.workspace = canvas;
@@ -48,29 +50,29 @@ var Paint = (function(document) {
         return "rgba("+red+","+green+","+blue+","+alpha+")";
     }
 
-    Paint.prototype.setPrimary(primary) {
+    Paint.prototype.setPrimary = function(primary) {
         this.colors[0] = primary;
     }
 
-    Paint.prototype.setSecondary(secondary) {
+    Paint.prototype.setSecondary = function(secondary) {
         this.colors[1] = secondary;
     }
 
-    Paint.prototype.setColors(primary, secondary) {
+    Paint.prototype.setColors = function(primary, secondary) {
         this.colors = [primary, secondary];
     }
 
-    Print.prototype.getColors() {
+    Paint.prototype.getColors = function() {
         return this.colors;
     }
 
-    Paint.prototype.addLayer(canvas, name = null) {
+    Paint.prototype.addLayer = function(canvas, name = null) {
         var newLayer = new Layer(++this._layerID, canvas, name);
         this.layers.push(newLayer);
         return newLayer;
     }
 
-    Paint.prototype.deleteLayer(id) {
+    Paint.prototype.deleteLayer = function(id) {
         for(var i=0; i < this.layers.length; i++) {
             if(this.layers[i].id === id) {
                 this.layers[i].finalize();
@@ -80,7 +82,7 @@ var Paint = (function(document) {
         }
     }
 
-    Paint.prototype.setLayer(id) {
+    Paint.prototype.setLayer = function(id) {
         for(var i=0; i < this.layers.length; i++) {
             if(this.layers[i].id === id) {
                 this.currentLayer = this.layers[i];
@@ -89,23 +91,23 @@ var Paint = (function(document) {
         }
     }
 
-    Paint.prototype.getLayers() {
+    Paint.prototype.getLayers = function() {
         return this.layers;
     }
 
-    Paint.prototype.setWeight(weight) {
+    Paint.prototype.setWeight = function(weight) {
         this.stroke = weight;
     }
 
-    Paint.prototype.getWeight() {
+    Paint.prototype.getWeight = function() {
         return this.stroke;
     }
 
-    Paint.prototype.setCurrentTool(tool) {
+    Paint.prototype.setCurrentTool = function(tool) {
         this.currentTool = tool;
     }
 
-    Paint.prototype.getCurrentTool() {
+    Paint.prototype.getCurrentTool = function() {
         return this.currentTool;
     }
 
@@ -133,7 +135,7 @@ var Paint = (function(document) {
 
             radgrad.addColorStop(0, addAlpha(colors[0], 1));
             radgrad.addColorStop(0.5, addAlpha(colors[0], 0.5));
-            radgrad.addColorStop(1, addAlpha(colors[0], 0);
+            radgrad.addColorStop(1, addAlpha(colors[0], 0));
 
             ctx.fillsytle = radgrad;
             ctx.fillRect(x - weight/2, y - weight/2, weight, weight);
@@ -176,20 +178,10 @@ var Paint = (function(document) {
     }
 
     function drawText() { // need to work on this more
-        // var textIn = document.createElement("input");
-        // textIn.setAttribute("type", "text");
-        // textIn.style.position = "absolute";
-        // textIn.style.left = mouseLock.x;
-        // textIn.style.top = mouseLock.y;
-        // textIn.id = "canvas-text-box";
-        //
-        // textIn.addEventListener("blur", function() {
-        //     var x = mouseLock.x;
-        //     var y = mouseLock.y;
-        //     ctx.fillText(this.value, x, y, )
-        // });
-        //
-        // workspace.parentNode.appendChild(textIn);
+        ctx.clearRect(0, 0, workspace.width, workspace.height);
+        ctx.rect(mouseLock.x, mouseLock.y,
+                 mouse.x - mouseLock.x, mouse.y - mouseLock.y);
+        ctx.stroke();
     }
 
     function erase() {
@@ -221,13 +213,22 @@ var Paint = (function(document) {
     }
 
 
-    Paint.prototype.init() {
+    Paint.prototype.init = function() {
         var tool = this.tool;
         var colorChooser = document.createElement("input");
         colorChooser.setAttribute("type", "color");
         colorChooser.addEventListener("change", function() {
             colors[0] = this.value;
         });
+
+
+        textBox = document.createElement("input");
+        textBox.setAttribute("type", "input");
+        textBox.style.position = "absolute";
+        textBox.style.left = mouseLock.x;
+        textBox.style.top = mouseLock.y;
+        textBox.style.width = mouseLock.x - mouse.x;
+        textBox.style.height = mouseLock.y - mouse.y;
 
         this.workspace.addEventListener("mousedown", function() {
             ctx.beginPath();
@@ -238,41 +239,44 @@ var Paint = (function(document) {
             switch(tool) {
             case "pencil":
                 canvas.addEventListener("mousemove", drawPencil);
-            break;
+                break;
             case "brush":
                 ctx.save();
                 canvas.addEventListener("mousemove", drawBrush);
-            break;
+                break;
             case "circle":
                 canvas.addEventListener("mousemove", drawCircle);
-            break;
+                break;
             case "square":
                 canvas.addEventListener("mousemove", drawSquare);
-            break;
+                break;
             case "line":
                 canvas.addEventListener("mousemove", drawLine);
-            break;
+                break;
             case "text":
+                ctx.save();
+                ctx.lineWidth = 1;
+                ctx.strokeColor = "#222";
                 canvas.addEventListener("mousemove", drawText);
-            break;
+                break;
             case "eraser":
                 canvas.addEventListener("mousemove", erase);
-            break;
+                break;
             case "dropper":
                 // canvas.addEventListener("click", findColor);
                 // handled in the mouseup event
-            break;
+                break;
             case "color":
                 // not likely to be needed
                 // will be handled in the mouseup event
-            break;
+                break;
             case "image":
                 canvas.addEventListener("mousemove", drawImage);
-            break;
+                break;
             default:
                 alert("Invalid tool selection");
                 // royal screw up
-            break;
+                break;
             }
         });
 
@@ -292,30 +296,38 @@ var Paint = (function(document) {
                     currentLayer.getCanvasContext().drawImage(workspace, 0, 0);
                 };
                 canvas.removeEventListener("mousemove", drawPencil);
-            break;
+                break;
             case "brush":
                 canvas.removeEventListener("mousemove", drawBrush);
                 ctx.restore();
                 currentLayer.getCanvasContext().drawImage(workspace, 0, 0);
-            break;
+                break;
             case "circle":
                 canvas.removeEventListener("mousemove", drawCircle);
                 currentLayer.getCanvasContext().drawImage(workspace, 0, 0);
-            break;
+                break;
             case "square":
                 canvas.removeEventListener("mousemove", drawSquare);
                 currentLayer.getCanvasContext().drawImage(workspace, 0, 0);
-            break;
+                break;
             case "line":
                 canvas.removeEventListener("mousemove", drawLine);
                 currentLayer.getCanvasContext().drawImage(workspace, 0, 0);
-            break;
+                break;
             case "text":
                 canvas.removeEventListener("mousemove", drawText)
-            break;
+
+                textBox.addEventListener("blur", function() {
+                    currentLayer.getCanvasContext().fillText(mouseLock.x,
+                        mouseLock.y, textBox.value, mouse.x - mouseLock.x);
+                    textBox.remove();
+                });
+                ctx.clearRect(0, 0, workspace.width, workspace.height);
+                ctx.restore();
+                break;
             case "eraser":
                 canvas.removeEventListener("mousemove", erase);
-            break;
+                break;
             case "dropper":
                 // canvas.removeEventListener("click", findColor);
                 var pix = currentLayer.getCanvasContext()
@@ -324,22 +336,22 @@ var Paint = (function(document) {
                 var green = parseInt(""+pix[1], 16);
                 var blue = parseInt(""+pix[2], 16);
                 colors[0] = "#" + red + green + blue;
-            break;
+                break;
             case "color":
                 colorChooser.click();
-            break;
+                break;
             case "image":
                 canvas.removeEventListener("mousemove", drawImage);
                 currentLaye.getCanvasContext().drawImage(workspace, 0, 0);
-            break;
+                break;
             default:
                 alert("Invalid tool selection");
                 // royal screw up
-            break;
+                break;
             }
             ctx.clearRect(0, 0, workspace.width, workspace.height);
         });
     }
 
-    return Paint();
+    return Paint;
 }(document));

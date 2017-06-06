@@ -75,11 +75,11 @@ var Layer = (function() {
         this.canvas = null;
     }
 
-    Layer.prototype.getID() {
+    Layer.prototype.getID = function() {
         return this.id;
     }
 
-    Layer.prototype.getName() {
+    Layer.prototype.getName = function() {
         if(this.name) {
             return this.name;
         }else {
@@ -87,19 +87,19 @@ var Layer = (function() {
         }
     }
 
-    Layer.prototaype.setName(str) {
+    Layer.prototype.setName = function(str) {
         this.name = str;
     }
 
-    Layer.prototype.getCanvas() {
+    Layer.prototype.getCanvas = function() {
         return this.canvas;
     }
 
-    Layer.prototype.getCanvasContext() {
+    Layer.prototype.getCanvasContext = function() {
         return this._context;
     }
 
-    Layer.prototype.finalize() {
+    Layer.prototype.finalize = function() {
         this.id = -1;
         this.name = null,
         this.canvas = null;
