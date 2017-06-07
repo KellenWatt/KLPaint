@@ -55,23 +55,33 @@ var History = (function() {
 }());
 
 
-var Layer = (function() {
+var Layer = (function(document) {
     var id;
-    var name;
     var canvas;
-    var _context;
+    var context;
     var history;
 
-    function Layer(lid, canvas, name = null) {
+    /**
+        Creates a model for a layer, creating the associated canvas and
+        inserting it into the DOM.
+    */
+    function Layer(parent, lid) {
         this.id = lid;
+        this.canvas = document.createElement("canvas");
+        this.canvas.width = parent.width;
+        this.canvas.height = parent.height;
+
+        parent.insertBefore(this.canvas, parent.firstChild);
+
         this.canvas = canvas;
-        this._context = canvas.getContext("2d");
-        this.name = name;
+        this.context = canvas.getContext("2d");
     }
 
+    // probably redundant
     Layer.prototype.remove = function() {
         this.id = -1;
         this.name = null;
+        this.canvas.remove();
         this.canvas = null;
     }
 
@@ -79,33 +89,22 @@ var Layer = (function() {
         return this.id;
     }
 
-    Layer.prototype.getName = function() {
-        if(this.name) {
-            return this.name;
-        }else {
-            return "Layer"+this.id;
-        }
-    }
-
-    Layer.prototype.setName = function(str) {
-        this.name = str;
-    }
-
     Layer.prototype.getCanvas = function() {
         return this.canvas;
     }
 
     Layer.prototype.getCanvasContext = function() {
-        return this._context;
+        return this.context;
     }
 
     Layer.prototype.finalize = function() {
         this.id = -1;
-        this.name = null,
+        this.name = null;
+        this.canvas.remove();
         this.canvas = null;
     }
 
 
 
     return Layer;
-}());
+}(document));

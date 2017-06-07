@@ -2,6 +2,7 @@ var Paint = (function(document) {
     // Perhaps include some way to tie a UI into the object
 
     var workspace;
+    var drawspace;
     var ctx; // canvas:workspace context
     var currentLayer;
     var layers = [];
@@ -26,17 +27,38 @@ var Paint = (function(document) {
 
     var points  = [];
 
-    // require pass dom element, check if canvas, else create canvas as child.
-    // Also, default argument aren't a valid thing
-    // refactor primary/secondary to take DOM colorpicker
-    function Paint(canvas, weight = 10, primary = "black", secondary = "white") {
 
-        this.workspace = canvas;
-        this.ctx = canvas.getContext("2d");
-        this.weight = stroke;
+    /**
+        Takes a container DOM element (eg. div), and creates a workspace canvas
+        and all layer containers inside of the element.
+
+        Takes colorpicker DOM elements (ie. <input type="color"...>), and
+        associates those with the colors of the canvas. Note that the colorpickers
+        don't strictly need to be the DOM  element, but need to have a 'value'
+        attribute.
+    */
+    function Paint(workspace, primary, secondary, weight) {
+        weight = typeof weight !== 'undefined' ? weight : 10;
+
+        this.drawspace = document.createElement("canvas");
+        this.drawspace.setAttribute("width", workspace.width);
+        this.drawspace.setAttribute("height", workspace.height);
+        this.workspace.appendChild(this.drawspace);
+        this.currentLayer = this.addLayer();
+
+        this.workspace = workspace;
+        this.ctx = drawspace.getContext("2d");
+        this.weight = weight;
         this.colors = [primary, secondary];
 
-        canvas.addEventListener("mousemove", function(e) {
+        this.ctx.lineWidth = weight;
+        this.currentLayer.getCanvasContext().lineWidth = weight;
+        this.ctx.fillColor = primary.value;
+        this.currentLayer.getCanvasContext().fillColor = primary.value;
+        this.ctx.strokeColor = secondary.value;
+        this.currentLayer.getCanvasContext().strokeColor = secondary.value;
+
+        drawspace.addEventListener("mousemove", function(e) {
             mouse.x = e.pageX - this.offsetLeft;
             mouse.y = e.pageY - this.offsetTop;
         });
@@ -50,24 +72,33 @@ var Paint = (function(document) {
         return "rgba("+red+","+green+","+blue+","+alpha+")";
     }
 
-    Paint.prototype.setPrimary = function(primary) {
+    Paint.prototype.setPrimaryColorPicker = function(primary) {
         this.colors[0] = primary;
+        ctx.fillColor = primary.value;
+        currentLayer.getCanvasContext().fillColor = primary.value;
     }
 
-    Paint.prototype.setSecondary = function(secondary) {
+    Paint.prototype.setSecondaryColorPicker = function(secondary) {
         this.colors[1] = secondary;
+        ctx.fillColor = secondary.value;
+        currentLayer.getCanvasContext().fillColor = secondary.value;
     }
 
-    Paint.prototype.setColors = function(primary, secondary) {
+    Paint.prototype.setColorPickers = function(primary, secondary) {
         this.colors = [primary, secondary];
+        this.ctx.fillColor = primary.value;
+        this.currentLayer.getCanvasContext().fillColor = primary.value;
+        this.ctx.strokeColor = secondary.value;
+        this.currentLayer.getCanvasContext().strokeColor = secondary.value;
     }
 
+    // Is this even practical?
     Paint.prototype.getColors = function() {
         return this.colors;
     }
 
-    Paint.prototype.addLayer = function(canvas, name = null) {
-        var newLayer = new Layer(++this._layerID, canvas, name);
+    Paint.prototype.addLayer = function() {
+        var newLayer = new Layer(workspace, ++this._layerID);
         this.layers.push(newLayer);
         return newLayer;
     }
@@ -96,7 +127,8 @@ var Paint = (function(document) {
     }
 
     Paint.prototype.setWeight = function(weight) {
-        this.stroke = weight;
+        this.weight = weight;
+        this.ctx.lineWidth = weight;
     }
 
     Paint.prototype.getWeight = function() {
@@ -109,6 +141,14 @@ var Paint = (function(document) {
 
     Paint.prototype.getCurrentTool = function() {
         return this.currentTool;
+    }
+
+    Paint.prototype.setImage(image) {
+        this.image = image
+    }
+
+    Paint.prototype.getImage() {
+        return image;
     }
 
 
@@ -133,9 +173,9 @@ var Paint = (function(document) {
 
             var radgrad = ctx.createRedialGradient(x, y, weight/4, x, y, weight/2);
 
-            radgrad.addColorStop(0, addAlpha(colors[0], 1));
-            radgrad.addColorStop(0.5, addAlpha(colors[0], 0.5));
-            radgrad.addColorStop(1, addAlpha(colors[0], 0));
+            radgrad.addColorStop(0, addAlpha(colors[0].value, 1));
+            radgrad.addColorStop(0.5, addAlpha(colors[0].value, 0.5));
+            radgrad.addColorStop(1, addAlpha(colors[0].value, 0));
 
             ctx.fillsytle = radgrad;
             ctx.fillRect(x - weight/2, y - weight/2, weight, weight);
@@ -199,7 +239,7 @@ var Paint = (function(document) {
         var red = parseInt(""+pix[0], 16);
         var green = parseInt(""+pix[1], 16);
         var blue = parseInt(""+pix[2], 16);
-        colors[0] = "#" + red + green + blue;
+        colors[0].value = "#" + red + green + blue;
     }
 
     function chooseColor() {
@@ -218,7 +258,7 @@ var Paint = (function(document) {
         var colorChooser = document.createElement("input");
         colorChooser.setAttribute("type", "color");
         colorChooser.addEventListener("change", function() {
-            colors[0] = this.value;
+            colors[0].value = this.value;
         });
 
 
@@ -335,7 +375,7 @@ var Paint = (function(document) {
                 var red = parseInt(""+pix[0], 16);
                 var green = parseInt(""+pix[1], 16);
                 var blue = parseInt(""+pix[2], 16);
-                colors[0] = "#" + red + green + blue;
+                colors[0].value = "#" + red + green + blue;
                 break;
             case "color":
                 colorChooser.click();
