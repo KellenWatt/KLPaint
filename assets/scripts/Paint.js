@@ -144,7 +144,7 @@ var Paint = (function(document) {
     }
 
     Paint.prototype.setImage(image) {
-        this.image = image
+        this.image = image;
     }
 
     Paint.prototype.getImage() {
