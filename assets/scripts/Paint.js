@@ -143,11 +143,11 @@ var Paint = (function(document) {
         return this.currentTool;
     }
 
-    Paint.prototype.setImage(image) {
+    Paint.prototype.setImage = function(image) {
         this.image = image;
     }
 
-    Paint.prototype.getImage() {
+    Paint.prototype.getImage = function() {
         return image;
     }
 

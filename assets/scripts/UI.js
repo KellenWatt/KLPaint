@@ -1,11 +1,5 @@
-var UICanvas = (function() {
+(function(document, ko, jq) {
 
-}());
 
-var UILayer = (function() {
-    var canvas; // UICanvas
-}());
 
-var UI = (function() {
-    var layers = [] // UILayers[]
-}());
+}(document, ko, $));
