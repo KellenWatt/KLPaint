@@ -6,7 +6,9 @@
     var iweight = +(document.getElementById("brush-size").value)
     var paint = new Paint(drawspace, color1, color2, iweight);
     paint.init();
-    paint.setCurrentTool("pencil");
+    paint.setCurrentTool("circle");
+    paint.setFill(true);
+    paint.setWeight(10);
 
     // Knockout stuff
 
@@ -20,4 +22,4 @@
     // End of other stuff
     // ...
     // What? Are you expecting more?
-}(document, ko, $));
+})(document, ko, $);

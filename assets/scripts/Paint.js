@@ -82,7 +82,8 @@ var Paint = (function(document) {
         var red = parseInt(hex.substring(1,3), 16);
         var green = parseInt(hex.substring(3,5), 16);
         var blue = parseInt(hex.substring(5,7), 16);
-        var alpha = parseInt(num, 16) / 255;
+        // var alpha = parseInt(num, 16) / 255; //alpha is [0,1]
+        var alpha = num;
         return "rgba("+red+","+green+","+blue+","+alpha+")";
     }
 
@@ -106,10 +107,14 @@ var Paint = (function(document) {
 
     Paint.prototype.setColorPickers = function(primary, secondary) {
         colors = [primary, secondary];
-        ctx.fillStyle = primary.value;
-        currentLayer.getCanvasContext().fillStyle = primary.value;
-        ctx.strokeStyle = secondary.value;
-        currentLayer.getCanvasContext().strokeStyle = secondary.value;
+        primary.addEventListener("change", function() {
+            ctx.fillStyle = primary.value;
+            currentLayer.getCanvasContext().fillStyle = primary.value;
+        });
+        secondary.addEventListener("change", function() {
+            ctx.strokeStyle = secondary.value;
+            currentLayer.getCanvasContext().strokeStyle = secondary.value;
+        });
     }
 
     // Is this even practical?
@@ -171,6 +176,14 @@ var Paint = (function(document) {
         return image;
     }
 
+    Paint.prototype.setFill = function(f) {
+        fill = f;
+    }
+
+    Paint.prototype.getFill = function() {
+        return fill;
+    }
+
 
     // Begin drawing functions
     function drawPencil() {
@@ -178,30 +191,39 @@ var Paint = (function(document) {
         ctx.stroke();
         points.push(new Point(mouse.x, mouse.y));
     }
-
+    function distanceBetween(point1, point2) {
+      return Math.sqrt(Math.pow(point2.x - point1.x, 2) + Math.pow(point2.y - point1.y, 2));
+    }
+    function angleBetween(point1, point2) {
+      return Math.atan2( point2.x - point1.x, point2.y - point1.y );
+    }
     function drawBrush() {
-        // Fill this in later because I don't know the exact implementation.
-        var dist = Math.sqrt(Math.pow(mouse.x - mouseLock.x, 2)
-                             + Math.pow(mouse.y - mouseLock.y,2));
-        var angle = Math.atan2(mouse.x - mouseLock.x, mouse.y - mouseLock.y);
+        var dist = distanceBetween(mouseLock, mouse);
+        var angle = angleBetween(mouseLock, mouse);
+        // var dist = Math.sqrt(Math.pow(mouse.x - mouseLock.x, 2)
+        //                      + Math.pow(mouse.y - mouseLock.y,2));
+        // var angle = Math.atan2(mouse.x - mouseLock.x, mouse.y - mouseLock.y);
         ctx.lineJoin = "round";
         ctx.lineCap = "round";
 
-        for(var i=0; i < dist; i += Math.ceil(weight/8)) {
+        // console.log(, "mLock: ", mouseLock);
+
+        for(var i=0; i < dist; i += weight/8) {
             x = mouseLock.x + (Math.sin(angle) * i);
             y = mouseLock.y + (Math.cos(angle) * i);
 
-            var radgrad = ctx.createRedialGradient(x, y, weight/4, x, y, weight/2);
+            var radgrad = ctx.createRadialGradient(x, y, weight/4, x, y, weight/2);
 
             radgrad.addColorStop(0, addAlpha(colors[0].value, 1));
             radgrad.addColorStop(0.5, addAlpha(colors[0].value, 0.5));
             radgrad.addColorStop(1, addAlpha(colors[0].value, 0));
 
-            ctx.fillsytle = radgrad;
+            ctx.fillStyle = radgrad;
             ctx.fillRect(x - weight/2, y - weight/2, weight, weight);
         }
 
-        mouseLock = mouse;
+        mouseLock.x = mouse.x;
+        mouseLock.y = mouse.y;
     }
 
     function drawCircle() {
@@ -209,7 +231,7 @@ var Paint = (function(document) {
         ctx.beginPath();
         var radius = Math.sqrt(Math.pow(mouse.x - mouseLock.x, 2) +
                                Math.pow(mouse.y - mouseLock.y, 2));
-        context.arc(mouseLock.x, mouseLock.y, radius, 0, 2*Math.PI);
+        ctx.arc(mouseLock.x, mouseLock.y, radius, 0, 2*Math.PI);
         if(fill) {
             ctx.fill();
         }else {
@@ -262,16 +284,11 @@ var Paint = (function(document) {
         colors[0].value = "#" + red + green + blue;
     }
 
-    function chooseColor() {
-        // probably not needed
-    }
-
     function drawImage() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(image, mouseLock.x, mouseLock.y,
                              mouse.x - mouseLock.x, mouse.y - mouseLock.y);
     }
-
 
     Paint.prototype.init = function() {
         var colorChooser = document.createElement("input");
@@ -290,7 +307,7 @@ var Paint = (function(document) {
         textBox.style.height = mouseLock.y - mouse.y;
 
 
-        canvas.addEventListener("mousedown", function() {
+        canvas.addEventListener("mousedown", function(e) {
             ctx.beginPath();
             ctx.moveTo(mouse.x, mouse.y);
             mouseLock.x = mouse.x;
@@ -299,6 +316,10 @@ var Paint = (function(document) {
             switch(currentTool) {
             case "pencil":
                 canvas.addEventListener("mousemove", drawPencil);
+                if(fill) {
+                    ctx.save();
+                    ctx.lineWidth = 1;
+                }
                 break;
             case "brush":
                 ctx.save();
@@ -344,36 +365,37 @@ var Paint = (function(document) {
             switch(currentTool) {
             case "pencil":
                 if(fill) {
-                    ctx.beginPath();
-                    ctx.moveTo(points[0].x, points[0].y);
+                    var context = currentLayer.getCanvasContext();
+                    context.beginPath();
+                    context.moveTo(points[0].x, points[0].y);
                     for(var i=0; i<points.length; i++) {
-                        ctx.lineTo(points[i].x, points[i].y);
+                        context.lineTo(points[i].x, points[i].y);
                     }
-                    ctx.fill();
-                    ctx.closePath();
+                    context.fill();
+                    context.closePath();
                     points = [];
+                    ctx.restore();
                 }else {
                     currentLayer.getCanvasContext().drawImage(canvas, 0, 0);
                 };
-                // ctx.clearRect(0, 0, canvas.width, canvas.height);
                 canvas.removeEventListener("mousemove", drawPencil);
                 break;
             case "brush":
                 canvas.removeEventListener("mousemove", drawBrush);
                 ctx.restore();
-                currentLayer.getCanvasContext().drawImage(workspace, 0, 0);
+                currentLayer.getCanvasContext().drawImage(canvas, 0, 0);
                 break;
             case "circle":
                 canvas.removeEventListener("mousemove", drawCircle);
-                currentLayer.getCanvasContext().drawImage(workspace, 0, 0);
+                currentLayer.getCanvasContext().drawImage(canvas, 0, 0);
                 break;
             case "square":
                 canvas.removeEventListener("mousemove", drawSquare);
-                currentLayer.getCanvasContext().drawImage(workspace, 0, 0);
+                currentLayer.getCanvasContext().drawImage(canvas, 0, 0);
                 break;
             case "line":
                 canvas.removeEventListener("mousemove", drawLine);
-                currentLayer.getCanvasContext().drawImage(workspace, 0, 0);
+                currentLayer.getCanvasContext().drawImage(canvas, 0, 0);
                 break;
             case "text":
                 canvas.removeEventListener("mousemove", drawText)
@@ -403,7 +425,7 @@ var Paint = (function(document) {
                 break;
             case "image":
                 canvas.removeEventListener("mousemove", drawImage);
-                currentLaye.getCanvasContext().drawImage(workspace, 0, 0);
+                currentLayer.getCanvasContext().drawImage(canvas, 0, 0);
                 break;
             default:
                 alert("Invalid tool selection");
@@ -415,4 +437,4 @@ var Paint = (function(document) {
     }
 
     return Paint;
-}(document));
+})(document);
