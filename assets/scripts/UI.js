@@ -6,7 +6,7 @@
 
     var paint = new Paint(drawspace, color1, color1, iweight);
     paint.init();
-    paint.setCurrentTool("dropper");
+    paint.setCurrentTool("brush");
 
     document.getElementById("fill").addEventListener("change", function() {
         paint.setFill(this.checked);

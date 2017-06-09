@@ -420,6 +420,7 @@ var Paint = (function(document) {
                 ctx.restore();
                 break;
             case "eraser":
+                // test on further integration
                 canvas.removeEventListener("mousemove", erase);
                 break;
             case "dropper":
@@ -435,9 +436,11 @@ var Paint = (function(document) {
                 colors[0].value = "#" + red + green + blue;
                 break;
             case "color":
+                // test on further integration
                 colorChooser.click();
                 break;
             case "image":
+                // test on further integration
                 canvas.removeEventListener("mousemove", drawImage);
                 currentLayer.getCanvasContext().drawImage(canvas, 0, 0);
                 break;
