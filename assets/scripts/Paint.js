@@ -1,8 +1,9 @@
 var Paint = (function(document) {
-    // Perhaps include some way to tie a UI into the object
+    var self = this;
+
 
     var workspace;
-    var drawspace;
+    var canvas;
     var ctx; // canvas:workspace context
     var currentLayer;
     var layers = [];
@@ -14,7 +15,7 @@ var Paint = (function(document) {
     var image;
     var textBox;
 
-    var _layerid = 0;
+    var _layerCounter = 0;
 
 
     function Point(x, y) {
@@ -37,30 +38,43 @@ var Paint = (function(document) {
         don't strictly need to be the DOM  element, but need to have a 'value'
         attribute.
     */
-    function Paint(workspace, primary, secondary, weight) {
+    function Paint(ws, primary, secondary, wt) {
         weight = typeof weight !== 'undefined' ? weight : 10;
+        layers = [];
 
-        this.drawspace = document.createElement("canvas");
-        this.drawspace.setAttribute("width", workspace.width);
-        this.drawspace.setAttribute("height", workspace.height);
-        this.workspace.appendChild(this.drawspace);
-        this.currentLayer = this.addLayer();
+        workspace = ws;
+        canvas = document.createElement("canvas");
+        canvas.setAttribute("width", workspace.offsetWidth);
+        canvas.setAttribute("height", workspace.offsetHeight);
+        canvas.style.position = "absolute";
+        canvas.style.left = 0;
+        canvas.style.top = 0;
+        workspace.appendChild(canvas);
+        currentLayer = this.addLayer();
 
-        this.workspace = workspace;
-        this.ctx = drawspace.getContext("2d");
-        this.weight = weight;
-        this.colors = [primary, secondary];
+        ctx = canvas.getContext("2d");
+        colors = [primary, secondary];
+        primary.addEventListener("change", function() {
+            ctx.fillStyle = primary.value;
+            currentLayer.getCanvasContext().fillStyle = primary.value;
+        });
+        secondary.addEventListener("change", function() {
+            ctx.strokeStyle = secondary.value;
+            currentLayer.getCanvasContext().strokeStyle = secondary.value;
+        });
 
-        this.ctx.lineWidth = weight;
-        this.currentLayer.getCanvasContext().lineWidth = weight;
-        this.ctx.fillColor = primary.value;
-        this.currentLayer.getCanvasContext().fillColor = primary.value;
-        this.ctx.strokeColor = secondary.value;
-        this.currentLayer.getCanvasContext().strokeColor = secondary.value;
+        ctx.lineWidth = weight;
+        currentLayer.getCanvasContext().lineWidth = weight;
+        ctx.fillStyle = primary.value;
+        currentLayer.getCanvasContext().fillStyle = primary.value;
+        ctx.strokeStyle = secondary.value;
+        currentLayer.getCanvasContext().strokeStyle = secondary.value;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
 
-        drawspace.addEventListener("mousemove", function(e) {
-            mouse.x = e.pageX - this.offsetLeft;
-            mouse.y = e.pageY - this.offsetTop;
+        canvas.addEventListener("mousemove", function(e) {
+            mouse.x = e.pageX - workspace.offsetLeft;
+            mouse.y = e.pageY - workspace.offsetTop;
         });
     }
 
@@ -73,78 +87,84 @@ var Paint = (function(document) {
     }
 
     Paint.prototype.setPrimaryColorPicker = function(primary) {
-        this.colors[0] = primary;
-        ctx.fillColor = primary.value;
-        currentLayer.getCanvasContext().fillColor = primary.value;
+        colors[0] = primary;
+        primary.addEventListener("change", function() {
+            ctx.fillStyle = primary.value;
+            currentLayer.getCanvasContext().fillStyle = primary.value;
+        });
     }
 
     Paint.prototype.setSecondaryColorPicker = function(secondary) {
-        this.colors[1] = secondary;
-        ctx.fillColor = secondary.value;
-        currentLayer.getCanvasContext().fillColor = secondary.value;
+        colors[1] = secondary;
+        secondary.addEventListener("change", function() {
+            ctx.strokeStyle = secondary.value;
+            currentLayer.getCanvasContext().strokeStyle = secondary.value;
+        });
+        // ctx.fillColor = secondary.value;
+        // currentLayer.getCanvasContext().fillColor = secondary.value;
     }
 
     Paint.prototype.setColorPickers = function(primary, secondary) {
-        this.colors = [primary, secondary];
-        this.ctx.fillColor = primary.value;
-        this.currentLayer.getCanvasContext().fillColor = primary.value;
-        this.ctx.strokeColor = secondary.value;
-        this.currentLayer.getCanvasContext().strokeColor = secondary.value;
+        colors = [primary, secondary];
+        ctx.fillStyle = primary.value;
+        currentLayer.getCanvasContext().fillStyle = primary.value;
+        ctx.strokeStyle = secondary.value;
+        currentLayer.getCanvasContext().strokeStyle = secondary.value;
     }
 
     // Is this even practical?
     Paint.prototype.getColors = function() {
-        return this.colors;
+        return colors;
     }
 
     Paint.prototype.addLayer = function() {
-        var newLayer = new Layer(workspace, ++this._layerID);
-        this.layers.push(newLayer);
+        var newLayer = new Layer(workspace, ++_layerCounter);
+        layers.push(newLayer);
         return newLayer;
     }
 
     Paint.prototype.deleteLayer = function(id) {
-        for(var i=0; i < this.layers.length; i++) {
-            if(this.layers[i].id === id) {
-                this.layers[i].finalize();
-                this.layers.splice(i, 1);
+        for(var i=0; i < layers.length; i++) {
+            if(layers[i].id === id) {
+                layers[i].finalize();
+                layers.splice(i, 1);
                 return;
             }
         }
     }
 
     Paint.prototype.setLayer = function(id) {
-        for(var i=0; i < this.layers.length; i++) {
-            if(this.layers[i].id === id) {
-                this.currentLayer = this.layers[i];
+        for(var i=0; i < layers.length; i++) {
+            if(layers[i].id === id) {
+                currentLayer = layers[i];
                 return;
             }
         }
     }
 
     Paint.prototype.getLayers = function() {
-        return this.layers;
+        return layers;
     }
 
-    Paint.prototype.setWeight = function(weight) {
-        this.weight = weight;
-        this.ctx.lineWidth = weight;
+    Paint.prototype.setWeight = function(wt) {
+        weight = wt;
+        ctx.lineWidth = wt;
     }
 
     Paint.prototype.getWeight = function() {
-        return this.stroke;
+        return weight;
     }
 
     Paint.prototype.setCurrentTool = function(tool) {
-        this.currentTool = tool;
+        currentTool = tool;
     }
 
     Paint.prototype.getCurrentTool = function() {
-        return this.currentTool;
+        return currentTool;
     }
 
-    Paint.prototype.setImage = function(image) {
-        this.image = image;
+    Paint.prototype.setImage = function(img) {
+        image = img;
     }
 
     Paint.prototype.getImage = function() {
@@ -154,7 +174,7 @@ var Paint = (function(document) {
 
     // Begin drawing functions
     function drawPencil() {
-        ctx.lineto(mouse.x, mouse.y);
+        ctx.lineTo(mouse.x, mouse.y);
         ctx.stroke();
         points.push(new Point(mouse.x, mouse.y));
     }
@@ -185,7 +205,7 @@ var Paint = (function(document) {
     }
 
     function drawCircle() {
-        ctx.clearRect(0, 0, workspace.width, workspace.height);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.beginPath();
         var radius = Math.sqrt(Math.pow(mouse.x - mouseLock.x, 2) +
                                Math.pow(mouse.y - mouseLock.y, 2));
@@ -198,7 +218,7 @@ var Paint = (function(document) {
     }
 
     function drawSqure() {
-        ctx.clearRect(0, 0, workspace.width, workspace.height);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.beginPath();
         ctx.rect(mouseLock.x, mouseLock.y,
                  mouse.x - mouseLock.x, mouse.y - mouseLock.y);
@@ -210,7 +230,7 @@ var Paint = (function(document) {
     }
 
     function drawLine() {
-        ctx.clearRect(0, 0, workspace.width, workspace.height);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.beginPath();
         ctx.moveTo(mouseLock.x, mouseLock.y);
         ctx.lineTo(mouse.x, mouse.y);
@@ -218,7 +238,7 @@ var Paint = (function(document) {
     }
 
     function drawText() { // need to work on this more
-        ctx.clearRect(0, 0, workspace.width, workspace.height);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.rect(mouseLock.x, mouseLock.y,
                  mouse.x - mouseLock.x, mouse.y - mouseLock.y);
         ctx.stroke();
@@ -247,14 +267,13 @@ var Paint = (function(document) {
     }
 
     function drawImage() {
-        ctx.clearRect(0, 0, workspace.width, workspace.height);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(image, mouseLock.x, mouseLock.y,
                              mouse.x - mouseLock.x, mouse.y - mouseLock.y);
     }
 
 
     Paint.prototype.init = function() {
-        var tool = this.tool;
         var colorChooser = document.createElement("input");
         colorChooser.setAttribute("type", "color");
         colorChooser.addEventListener("change", function() {
@@ -270,13 +289,14 @@ var Paint = (function(document) {
         textBox.style.width = mouseLock.x - mouse.x;
         textBox.style.height = mouseLock.y - mouse.y;
 
-        this.workspace.addEventListener("mousedown", function() {
+
+        canvas.addEventListener("mousedown", function() {
             ctx.beginPath();
-            ctx.moveTo(this.mouse.x, this.mouse.y);
+            ctx.moveTo(mouse.x, mouse.y);
             mouseLock.x = mouse.x;
             mouseLock.y = mouse.y;
 
-            switch(tool) {
+            switch(currentTool) {
             case "pencil":
                 canvas.addEventListener("mousemove", drawPencil);
                 break;
@@ -320,8 +340,8 @@ var Paint = (function(document) {
             }
         });
 
-        this.workspace.addEventListener("mouseup", function() {
-            switch(tool) {
+        canvas.addEventListener("mouseup", function() {
+            switch(currentTool) {
             case "pencil":
                 if(fill) {
                     ctx.beginPath();
@@ -333,8 +353,9 @@ var Paint = (function(document) {
                     ctx.closePath();
                     points = [];
                 }else {
-                    currentLayer.getCanvasContext().drawImage(workspace, 0, 0);
+                    currentLayer.getCanvasContext().drawImage(canvas, 0, 0);
                 };
+                // ctx.clearRect(0, 0, canvas.width, canvas.height);
                 canvas.removeEventListener("mousemove", drawPencil);
                 break;
             case "brush":
@@ -362,7 +383,7 @@ var Paint = (function(document) {
                         mouseLock.y, textBox.value, mouse.x - mouseLock.x);
                     textBox.remove();
                 });
-                ctx.clearRect(0, 0, workspace.width, workspace.height);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
                 ctx.restore();
                 break;
             case "eraser":
@@ -389,7 +410,7 @@ var Paint = (function(document) {
                 // royal screw up
                 break;
             }
-            ctx.clearRect(0, 0, workspace.width, workspace.height);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
         });
     }
 

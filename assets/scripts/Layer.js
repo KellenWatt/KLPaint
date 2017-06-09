@@ -66,42 +66,44 @@ var Layer = (function(document) {
         inserting it into the DOM.
     */
     function Layer(parent, lid) {
-        this.id = lid;
-        this.canvas = document.createElement("canvas");
-        this.canvas.width = parent.width;
-        this.canvas.height = parent.height;
+        id = lid;
+        canvas = document.createElement("canvas");
+        canvas.width = parent.offsetWidth;
+        canvas.height = parent.offsetHeight;
+        canvas.style.position = "absolute";
+        canvas.style.left = 0;
+        canvas.style.top = 0;
 
-        parent.insertBefore(this.canvas, parent.firstChild);
+        parent.insertBefore(canvas, parent.firstChild);
 
-        this.canvas = canvas;
-        this.context = canvas.getContext("2d");
+        context = canvas.getContext("2d");
     }
 
     // probably redundant
     Layer.prototype.remove = function() {
-        this.id = -1;
-        this.name = null;
-        this.canvas.remove();
-        this.canvas = null;
+        id = -1;
+        name = null;
+        canvas.remove();
+        canvas = null;
     }
 
     Layer.prototype.getID = function() {
-        return this.id;
+        return id;
     }
 
     Layer.prototype.getCanvas = function() {
-        return this.canvas;
+        return canvas;
     }
 
     Layer.prototype.getCanvasContext = function() {
-        return this.context;
+        return context;
     }
 
     Layer.prototype.finalize = function() {
-        this.id = -1;
-        this.name = null;
-        this.canvas.remove();
-        this.canvas = null;
+        id = -1;
+        name = null;
+        canvas.remove();
+        canvas = null;
     }
 
 
