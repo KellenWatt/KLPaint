@@ -239,7 +239,7 @@ var Paint = (function(document) {
         }
     }
 
-    function drawSqure() {
+    function drawRectangle() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.beginPath();
         ctx.rect(mouseLock.x, mouseLock.y,
@@ -261,6 +261,7 @@ var Paint = (function(document) {
 
     function drawText() { // need to work on this more
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.beginPath();
         ctx.rect(mouseLock.x, mouseLock.y,
                  mouse.x - mouseLock.x, mouse.y - mouseLock.y);
         ctx.stroke();
@@ -298,13 +299,12 @@ var Paint = (function(document) {
         });
 
 
-        textBox = document.createElement("input");
-        textBox.setAttribute("type", "input");
+        textBox = document.createElement("textarea");
         textBox.style.position = "absolute";
-        textBox.style.left = mouseLock.x;
-        textBox.style.top = mouseLock.y;
-        textBox.style.width = mouseLock.x - mouse.x;
-        textBox.style.height = mouseLock.y - mouse.y;
+        // textBox.style.left = mouseLock.x;
+        // textBox.style.top = mouseLock.y;
+        // textBox.style.width = mouseLock.x - mouse.x;
+        // textBox.style.height = mouseLock.y - mouse.y;
 
 
         canvas.addEventListener("mousedown", function(e) {
@@ -329,7 +329,9 @@ var Paint = (function(document) {
                 canvas.addEventListener("mousemove", drawCircle);
                 break;
             case "square":
-                canvas.addEventListener("mousemove", drawSquare);
+                ctx.save();
+                ctx.lineJoin = "miter";
+                canvas.addEventListener("mousemove", drawRectangle);
                 break;
             case "line":
                 canvas.addEventListener("mousemove", drawLine);
@@ -361,7 +363,7 @@ var Paint = (function(document) {
             }
         });
 
-        canvas.addEventListener("mouseup", function() {
+        canvas.addEventListener("mouseup", function(e) {
             switch(currentTool) {
             case "pencil":
                 if(fill) {
@@ -390,7 +392,8 @@ var Paint = (function(document) {
                 currentLayer.getCanvasContext().drawImage(canvas, 0, 0);
                 break;
             case "square":
-                canvas.removeEventListener("mousemove", drawSquare);
+                canvas.removeEventListener("mousemove", drawRectangle);
+                ctx.restore();
                 currentLayer.getCanvasContext().drawImage(canvas, 0, 0);
                 break;
             case "line":
@@ -398,11 +401,19 @@ var Paint = (function(document) {
                 currentLayer.getCanvasContext().drawImage(canvas, 0, 0);
                 break;
             case "text":
+            // TODO: Definitely need to look at this more
                 canvas.removeEventListener("mousemove", drawText)
 
+                textBox.style.left = mouseLock.x + "px";
+                textBox.style.top = mouseLock.y + "px";
+                textBox.style.width = mouse.x - mouseLock.x + "px";
+                textBox.style.height = mouse.y - mouseLock.y + "px";
+
+                workspace.appendChild(textBox);
+                textBox.focus();
                 textBox.addEventListener("blur", function() {
-                    currentLayer.getCanvasContext().fillText(mouseLock.x,
-                        mouseLock.y, textBox.value, mouse.x - mouseLock.x);
+                    currentLayer.getCanvasContext().fillText(textBox.value,
+                        mouseLock.x, mouseLock.y, mouse.x - mouseLock.x);
                     textBox.remove();
                 });
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -415,9 +426,12 @@ var Paint = (function(document) {
                 // canvas.removeEventListener("click", findColor);
                 var pix = currentLayer.getCanvasContext()
                             .getImageData(mouse.x, mouse.y, 1, 1).data;
-                var red = parseInt(""+pix[0], 16);
-                var green = parseInt(""+pix[1], 16);
-                var blue = parseInt(""+pix[2], 16);
+                var red = (255-pix[0]).toString(16);
+                var green = (255-pix[1]).toString(16);
+                var blue = (255-pix[2]).toString(16);
+                if(red.length == 1) red = "0" + ("" + red);
+                if(green.length == 1) green = "0" + ("" + green);
+                if(blue.length == 1) blue = "0" + ("" + blue);
                 colors[0].value = "#" + red + green + blue;
                 break;
             case "color":

@@ -2,13 +2,20 @@
     // Paint declaration pre-reqs
     var drawspace = document.getElementById("drawspace");
     var color1 = document.getElementById("primary-color");
-    var color2 = document.getElementById("secondary-color");
     var iweight = +(document.getElementById("brush-size").value)
-    var paint = new Paint(drawspace, color1, color2, iweight);
+
+    var paint = new Paint(drawspace, color1, color1, iweight);
     paint.init();
-    paint.setCurrentTool("circle");
-    paint.setFill(true);
-    paint.setWeight(10);
+    paint.setCurrentTool("dropper");
+
+    document.getElementById("fill").addEventListener("change", function() {
+        paint.setFill(this.checked);
+    });
+
+    document.getElementById("brush-size").addEventListener("change", function(){
+        paint.setWeight(+this.value);
+    });
+
 
     // Knockout stuff
 
