@@ -204,12 +204,9 @@ var Paint = (function(document) {
     function drawBrush() {
         var dist = distanceBetween(mouseLock, mouse);
         var angle = angleBetween(mouseLock, mouse);
-        // var dist = Math.sqrt(Math.pow(mouse.x - mouseLock.x, 2)
-        //                      + Math.pow(mouse.y - mouseLock.y,2));
-        // var angle = Math.atan2(mouse.x - mouseLock.x, mouse.y - mouseLock.y);
+
         ctx.lineJoin = "round";
         ctx.lineCap = "round";
-
 
         for(var i=0; i < dist; i += weight/8) {
             x = mouseLock.x + (Math.sin(angle) * i);
@@ -279,14 +276,6 @@ var Paint = (function(document) {
         context.restore();
     }
 
-    // function findColor() {
-    //     var pix = currentLayer.getCanvasContext()
-    //                 .getImageData(mouse.x, mouse.y, 1, 1).data;
-    //     var red = parseInt(""+pix[0], 16);
-    //     var green = parseInt(""+pix[1], 16);
-    //     var blue = parseInt(""+pix[2], 16);
-    //     colors[0] = "#" + red + green + blue;
-    // }
 
     function drawImage() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -422,11 +411,8 @@ var Paint = (function(document) {
                 canvas.removeEventListener("mousemove", erase);
                 break;
             case "dropper":
-                // canvas.removeEventListener("click", findColor);
                 var pix = currentLayer.getCanvasContext()
                             .getImageData(mouse.x, mouse.y, 1, 1).data;
-
-
 
                 var red = (pix[0]).toString(16);
                 var green = (pix[1]).toString(16);
@@ -435,15 +421,14 @@ var Paint = (function(document) {
                 if(red.length == 1) red = "0" + ("" + red);
                 if(green.length == 1) green = "0" + ("" + green);
                 if(blue.length == 1) blue = "0" + ("" + blue);
+
                 self.setPrimaryColor("#" + red + green + blue);
                 self.setSecondaryColor("#" + red + green + blue);
                 break;
             case "color":
-                // test on further integration
                 colorChooser.click();
                 break;
             case "image":
-                // test on further integration
                 canvas.removeEventListener("mousemove", drawImage);
                 currentLayer.getCanvasContext().drawImage(canvas, 0, 0);
                 break;
@@ -461,6 +446,14 @@ var Paint = (function(document) {
                             currentLayer.getCanvas().width,
                             currentLayer.getCanvas().height);
     };
+
+    Paint.prototype.nuke = function() {
+        for(var i=0; i<layers.length; i++) {
+            layers[i].finalize();
+        }
+        layers = [];
+        this.addLayer();
+    }
 
     return Paint;
 })(document);

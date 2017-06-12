@@ -79,14 +79,6 @@ var Layer = (function(document) {
         context = canvas.getContext("2d");
     }
 
-    // probably redundant
-    Layer.prototype.remove = function() {
-        id = -1;
-        name = null;
-        canvas.remove();
-        canvas = null;
-    }
-
     Layer.prototype.getID = function() {
         return id;
     }
