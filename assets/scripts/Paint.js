@@ -1,5 +1,5 @@
 var Paint = (function(document) {
-    var self = this;
+    var self;
 
 
     var workspace;
@@ -10,7 +10,7 @@ var Paint = (function(document) {
     var colors = [];
     var weight;
     var currentTool;
-    var fill = false;
+    var fill;
 
     var image;
     var textBox;
@@ -191,7 +191,6 @@ var Paint = (function(document) {
 
     // Begin drawing functions
     function drawPencil() {
-
         ctx.lineTo(mouse.x, mouse.y);
         ctx.stroke();
         points.push(new Point(mouse.x, mouse.y));
@@ -299,7 +298,7 @@ var Paint = (function(document) {
         var colorChooser = document.createElement("input");
         colorChooser.setAttribute("type", "color");
         colorChooser.addEventListener("change", function() {
-            self.setcolors(this.value, this.value);
+            self.setColors(this.value, this.value);
         });
 
 

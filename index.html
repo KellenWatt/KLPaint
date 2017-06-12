@@ -69,7 +69,9 @@
             <label for="color"><img src="assets/images/color.png" alt="color"></label>
 
             <input type="radio" id="image" name="tool-selection" value="image" data-bind="checked: selectedTool">
-            <label for="image"><img src="assets/images/image.png" alt="image"></label>
+            <label for="image" data-bind="click: findImage">
+                <img src="assets/images/image.png" alt="image">
+            </label>
             <div class="color">
                 <input type="color" class="color-selection" id="primary-color" data-bind="value: primaryColor"/>
                 <!-- <input type="color" class="color-selection" id="secondary-color" /> -->

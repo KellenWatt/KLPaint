@@ -4,7 +4,6 @@
     var color = document.getElementById("primary-color");
     var iweight = +(document.getElementById("brush-size").value)
 
-    console.log(color.value);
     var paint = new Paint(drawspace, color.value, color.value, iweight);
     paint.init();
     // paint.setCurrentTool("brush");
@@ -13,17 +12,30 @@
     //     paint.setColors(this.value, this.value);
     // });
 
-    document.getElementById("fill").addEventListener("change", function() {
-        paint.setFill(this.checked);
-    });
-
-    // document.getElementById("brush-size").addEventListener("change", function(){
-    //     if(this.value < 1) {
-    //         this.value = 1;
-    //     }
-    //     paint.setWeight(+this.value);
+    // document.getElementById("fill").addEventListener("change", function() {
+    //     paint.setFill(this.checked);
     // });
 
+    var fileChooser = document.createElement("input");
+    fileChooser.type = "file";
+    fileChooser.addEventListener("change", function(e) {
+        console.log(e.target.files[0]);
+        var file = e.target.files[0];
+
+        var reader = new FileReader();
+
+        reader.addEventListener("load", function(f) {
+            return function(e) {
+                var img = new Image();
+                img.src = e.target.result;
+                paint.setImage(img);
+                console.log(paint.getImage());
+            };
+        }(file));
+
+        reader.readAsDataURL(file);
+
+    }, false);
 
     // Knockout bindings
 
@@ -71,6 +83,11 @@
         });
         this.selectedTool("pencil");
 
+        this.findImage = function() {
+            self.selectedTool("image");
+            fileChooser.click();
+        };
+
         this.primaryColor = ko.observable();
         this.primaryColor.subscribe(function(color) {
             paint.setColors(color, color);
@@ -96,9 +113,10 @@
         this.brushWeight(10);
 
         this.fillValue = ko.observable();
-        this.brushWeight.subscribe(function(fill) {
-            paint.setFill(fill);
+        this.fillValue.subscribe(function(f) {
+            paint.setFill(f);
         });
+        this.fillValue(false);
     }
 
     ko.applyBindings(PaintViewModel());
