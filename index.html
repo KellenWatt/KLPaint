@@ -71,19 +71,19 @@
             <input type="radio" id="image" name="tool-selection" value="image" data-bind="checked: selectedTool">
             <label for="image"><img src="assets/images/image.png" alt="image"></label>
             <div class="color">
-                <input type="color" class="color-selection" id="primary-color" />
+                <input type="color" class="color-selection" id="primary-color" data-bind="value: primaryColor"/>
                 <!-- <input type="color" class="color-selection" id="secondary-color" /> -->
             </div>
             <div class="brush-size">
                 <label for="brush-size">Weight:</label>
-                <input type="number" name="brush-size" min="1" id="brush-size" value="10"/>
+                <input type="number" name="brush-size" min="1" id="brush-size" data-bind="value: brushWeight"/>
             </div>
             <!-- <div class="antialias">
                 <input type="checkbox" name="antialias" id="antialias" checked />
                 <label for="antialias">Anti-alias</label>
             </div> -->
             <div class="antialias">
-                <input type="checkbox" name="fill" id="fill">
+                <input type="checkbox" name="fill" id="fill" data-bind="checked: fillValue">
                 <label for="fill">Fill</label>
             </div>
         </div>

@@ -17,6 +17,7 @@ var Paint = (function(document) {
 
     var _layerCounter = 0;
 
+    var cb;
 
     function Point(x, y) {
         this.x = x;
@@ -27,7 +28,7 @@ var Paint = (function(document) {
     var mouseLock = new Point(0, 0);
 
     var points  = [];
-
+    var self;
 
     /**
         Takes a container DOM element (eg. div), and creates a workspace canvas
@@ -39,6 +40,7 @@ var Paint = (function(document) {
         attribute.
     */
     function Paint(ws, primary, secondary, wt) {
+        self = this;
         colors[0] = typeof primary !== 'undefined' ? primary : "#000000";
         colors[1] = typeof secondary !== 'undefined' ? secondary : "#000000";
         weight = typeof wt !== 'undefined' ? wt : 10;
@@ -89,31 +91,38 @@ var Paint = (function(document) {
 
     Paint.prototype.setPrimaryColor = function(primary) {
         colors[0] = primary;
+        if(cb) cb();
 
-        ctx.strokeStyle = primary.value;
-        currentLayer.getCanvasContext().strokeStyle = primary.value;
+        ctx.fillStyle = primary;
+        currentLayer.getCanvasContext().fillStyle = primary;
     };
 
     Paint.prototype.setSecondaryColor = function(secondary) {
         colors[1] = secondary;
+        if(cb) cb();
 
-        ctx.fillColor = secondary.value;
-        currentLayer.getCanvasContext().fillColor = secondary.value;
+        ctx.strokeStyle = secondary;
+        currentLayer.getCanvasContext().strokeStyle = secondary;
     };
 
     Paint.prototype.setColors = function(primary, secondary) {
         colors = [primary, secondary];
+        if(cb) cb();
 
-        ctx.fillStyle = primary.value;
-        currentLayer.getCanvasContext().fillStyle = primary.value;
+        ctx.fillStyle = primary;
+        currentLayer.getCanvasContext().fillStyle = primary;
 
-        ctx.strokeStyle = secondary.value;
-        currentLayer.getCanvasContext().strokeStyle = secondary.value;
+        ctx.strokeStyle = secondary;
+        currentLayer.getCanvasContext().strokeStyle = secondary;
     };
 
     // Is this even practical?
     Paint.prototype.getColors = function() {
         return colors;
+    };
+
+    Paint.prototype.setColorChangeCallback = function(callback) {
+        cb = callback;
     };
 
     Paint.prototype.addLayer = function() {
@@ -148,6 +157,7 @@ var Paint = (function(document) {
     Paint.prototype.setWeight = function(wt) {
         weight = wt;
         ctx.lineWidth = wt;
+        currentLayer.getCanvasContext().lineWidth = wt;
     };
 
     Paint.prototype.getWeight = function() {
@@ -181,6 +191,7 @@ var Paint = (function(document) {
 
     // Begin drawing functions
     function drawPencil() {
+
         ctx.lineTo(mouse.x, mouse.y);
         ctx.stroke();
         points.push(new Point(mouse.x, mouse.y));
@@ -269,14 +280,14 @@ var Paint = (function(document) {
         context.restore();
     }
 
-    function findColor() {
-        var pix = currentLayer.getCanvasContext()
-                    .getImageData(mouse.x, mouse.y, 1, 1).data;
-        var red = parseInt(""+pix[0], 16);
-        var green = parseInt(""+pix[1], 16);
-        var blue = parseInt(""+pix[2], 16);
-        colors[0] = "#" + red + green + blue;
-    }
+    // function findColor() {
+    //     var pix = currentLayer.getCanvasContext()
+    //                 .getImageData(mouse.x, mouse.y, 1, 1).data;
+    //     var red = parseInt(""+pix[0], 16);
+    //     var green = parseInt(""+pix[1], 16);
+    //     var blue = parseInt(""+pix[2], 16);
+    //     colors[0] = "#" + red + green + blue;
+    // }
 
     function drawImage() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -288,17 +299,12 @@ var Paint = (function(document) {
         var colorChooser = document.createElement("input");
         colorChooser.setAttribute("type", "color");
         colorChooser.addEventListener("change", function() {
-            colors[0] = this.value;
+            self.setcolors(this.value, this.value);
         });
 
 
         textBox = document.createElement("textarea");
         textBox.style.position = "absolute";
-        // textBox.style.left = mouseLock.x;
-        // textBox.style.top = mouseLock.y;
-        // textBox.style.width = mouseLock.x - mouse.x;
-        // textBox.style.height = mouseLock.y - mouse.y;
-
 
         canvas.addEventListener("mousedown", function(e) {
             ctx.beginPath();
@@ -368,11 +374,11 @@ var Paint = (function(document) {
                     }
                     context.fill();
                     context.closePath();
-                    points = [];
                     ctx.restore();
                 }else {
                     currentLayer.getCanvasContext().drawImage(canvas, 0, 0);
                 };
+                points = [];
                 canvas.removeEventListener("mousemove", drawPencil);
                 break;
             case "brush":
@@ -420,13 +426,18 @@ var Paint = (function(document) {
                 // canvas.removeEventListener("click", findColor);
                 var pix = currentLayer.getCanvasContext()
                             .getImageData(mouse.x, mouse.y, 1, 1).data;
-                var red = (255-pix[0]).toString(16);
-                var green = (255-pix[1]).toString(16);
-                var blue = (255-pix[2]).toString(16);
+
+
+
+                var red = (pix[0]).toString(16);
+                var green = (pix[1]).toString(16);
+                var blue = (pix[2]).toString(16);
+
                 if(red.length == 1) red = "0" + ("" + red);
                 if(green.length == 1) green = "0" + ("" + green);
                 if(blue.length == 1) blue = "0" + ("" + blue);
-                colors[0] = "#" + red + green + blue;
+                self.setPrimaryColor("#" + red + green + blue);
+                self.setSecondaryColor("#" + red + green + blue);
                 break;
             case "color":
                 // test on further integration
