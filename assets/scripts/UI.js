@@ -19,9 +19,7 @@
     var fileChooser = document.createElement("input");
     fileChooser.type = "file";
     fileChooser.addEventListener("change", function(e) {
-        console.log(e.target.files[0]);
         var file = e.target.files[0];
-
         var reader = new FileReader();
 
         reader.addEventListener("load", function(f) {
@@ -29,7 +27,6 @@
                 var img = new Image();
                 img.src = e.target.result;
                 paint.setImage(img);
-                console.log(paint.getImage());
             };
         }(file));
 

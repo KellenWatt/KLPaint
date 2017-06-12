@@ -268,12 +268,15 @@ var Paint = (function(document) {
     }
 
     function erase() {
-        var context = currentLayer.getCanvasContext();
-        context.save();
-        context.arc(mouse.x, mouse.y, weight, 0, 2*Math.PI, true);
-        context.clip();
-        context.clearRect(mouse.x - weight, mouse.y - weight, weight*2, weight*2);
-        context.restore();
+        // var context = currentLayer.getCanvasContext();
+        // context.save();
+        // context.arc(mouse.x, mouse.y, weight, 0, 2*Math.PI, true);
+        // context.clip();
+        // context.clearRect(mouse.x - weight, mouse.y - weight, weight*2, weight*2);
+        // context.restore();
+        var cxt = currentLayer.getCanvasContext();
+        cxt.lineTo(mouse.x, mouse.y);
+        cxt.stroke();
     }
 
 
@@ -330,6 +333,11 @@ var Paint = (function(document) {
                 canvas.addEventListener("mousemove", drawText);
                 break;
             case "eraser":
+                currentLayer.getCanvasContext().save();
+                currentLayer.getCanvasContext().lineJoin = "round";
+                currentLayer.getCanvasContext().lineCap = "round";
+                currentLayer.getCanvasContext().globalCompositeOperation = "destination-out"
+                currentLayer.getCanvasContext().beginPath();
                 canvas.addEventListener("mousemove", erase);
                 break;
             case "dropper":
@@ -409,6 +417,7 @@ var Paint = (function(document) {
             case "eraser":
                 // test on further integration
                 canvas.removeEventListener("mousemove", erase);
+                currentLayer.getCanvasContext().restore();
                 break;
             case "dropper":
                 var pix = currentLayer.getCanvasContext()
