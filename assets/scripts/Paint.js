@@ -39,7 +39,10 @@ var Paint = (function(document) {
         attribute.
     */
     function Paint(ws, primary, secondary, wt) {
-        weight = typeof weight !== 'undefined' ? weight : 10;
+        colors[0] = typeof primary !== 'undefined' ? primary : "#000000";
+        colors[1] = typeof secondary !== 'undefined' ? secondary : "#000000";
+        weight = typeof wt !== 'undefined' ? wt : 10;
+
         layers = [];
 
         workspace = ws;
@@ -53,15 +56,12 @@ var Paint = (function(document) {
         currentLayer = this.addLayer();
 
         ctx = canvas.getContext("2d");
-        colors = [primary, secondary];
-        primary.addEventListener("change", function() {
-            ctx.fillStyle = primary.value;
-            currentLayer.getCanvasContext().fillStyle = primary.value;
-        });
-        secondary.addEventListener("change", function() {
-            ctx.strokeStyle = secondary.value;
-            currentLayer.getCanvasContext().strokeStyle = secondary.value;
-        });
+
+        ctx.fillStyle = primary.value;
+        currentLayer.getCanvasContext().fillStyle = primary.value;
+
+        ctx.strokeStyle = secondary.value;
+        currentLayer.getCanvasContext().strokeStyle = secondary.value;
 
         ctx.lineWidth = weight;
         currentLayer.getCanvasContext().lineWidth = weight;
@@ -87,46 +87,40 @@ var Paint = (function(document) {
         return "rgba("+red+","+green+","+blue+","+alpha+")";
     }
 
-    Paint.prototype.setPrimaryColorPicker = function(primary) {
+    Paint.prototype.setPrimaryColor = function(primary) {
         colors[0] = primary;
-        primary.addEventListener("change", function() {
-            ctx.fillStyle = primary.value;
-            currentLayer.getCanvasContext().fillStyle = primary.value;
-        });
-    }
 
-    Paint.prototype.setSecondaryColorPicker = function(secondary) {
+        ctx.strokeStyle = primary.value;
+        currentLayer.getCanvasContext().strokeStyle = primary.value;
+    };
+
+    Paint.prototype.setSecondaryColor = function(secondary) {
         colors[1] = secondary;
-        secondary.addEventListener("change", function() {
-            ctx.strokeStyle = secondary.value;
-            currentLayer.getCanvasContext().strokeStyle = secondary.value;
-        });
-        // ctx.fillColor = secondary.value;
-        // currentLayer.getCanvasContext().fillColor = secondary.value;
-    }
 
-    Paint.prototype.setColorPickers = function(primary, secondary) {
+        ctx.fillColor = secondary.value;
+        currentLayer.getCanvasContext().fillColor = secondary.value;
+    };
+
+    Paint.prototype.setColors = function(primary, secondary) {
         colors = [primary, secondary];
-        primary.addEventListener("change", function() {
-            ctx.fillStyle = primary.value;
-            currentLayer.getCanvasContext().fillStyle = primary.value;
-        });
-        secondary.addEventListener("change", function() {
-            ctx.strokeStyle = secondary.value;
-            currentLayer.getCanvasContext().strokeStyle = secondary.value;
-        });
-    }
+
+        ctx.fillStyle = primary.value;
+        currentLayer.getCanvasContext().fillStyle = primary.value;
+
+        ctx.strokeStyle = secondary.value;
+        currentLayer.getCanvasContext().strokeStyle = secondary.value;
+    };
 
     // Is this even practical?
     Paint.prototype.getColors = function() {
         return colors;
-    }
+    };
 
     Paint.prototype.addLayer = function() {
         var newLayer = new Layer(workspace, ++_layerCounter);
         layers.push(newLayer);
         return newLayer;
-    }
+    };
 
     Paint.prototype.deleteLayer = function(id) {
         for(var i=0; i < layers.length; i++) {
@@ -136,7 +130,7 @@ var Paint = (function(document) {
                 return;
             }
         }
-    }
+    };
 
     Paint.prototype.setLayer = function(id) {
         for(var i=0; i < layers.length; i++) {
@@ -145,44 +139,44 @@ var Paint = (function(document) {
                 return;
             }
         }
-    }
+    };
 
     Paint.prototype.getLayers = function() {
         return layers;
-    }
+    };
 
     Paint.prototype.setWeight = function(wt) {
         weight = wt;
         ctx.lineWidth = wt;
-    }
+    };
 
     Paint.prototype.getWeight = function() {
         return weight;
-    }
+    };
 
     Paint.prototype.setCurrentTool = function(tool) {
         currentTool = tool;
-    }
+    };
 
     Paint.prototype.getCurrentTool = function() {
         return currentTool;
-    }
+    };
 
     Paint.prototype.setImage = function(img) {
         image = img;
-    }
+    };
 
     Paint.prototype.getImage = function() {
         return image;
-    }
+    };
 
     Paint.prototype.setFill = function(f) {
         fill = f;
-    }
+    };
 
     Paint.prototype.getFill = function() {
         return fill;
-    }
+    };
 
 
     // Begin drawing functions
@@ -206,7 +200,6 @@ var Paint = (function(document) {
         ctx.lineJoin = "round";
         ctx.lineCap = "round";
 
-        // console.log(, "mLock: ", mouseLock);
 
         for(var i=0; i < dist; i += weight/8) {
             x = mouseLock.x + (Math.sin(angle) * i);
@@ -214,9 +207,9 @@ var Paint = (function(document) {
 
             var radgrad = ctx.createRadialGradient(x, y, weight/4, x, y, weight/2);
 
-            radgrad.addColorStop(0, addAlpha(colors[0].value, 1));
-            radgrad.addColorStop(0.5, addAlpha(colors[0].value, 0.5));
-            radgrad.addColorStop(1, addAlpha(colors[0].value, 0));
+            radgrad.addColorStop(0, addAlpha(colors[0], 1));
+            radgrad.addColorStop(0.5, addAlpha(colors[0], 0.5));
+            radgrad.addColorStop(1, addAlpha(colors[0], 0));
 
             ctx.fillStyle = radgrad;
             ctx.fillRect(x - weight/2, y - weight/2, weight, weight);
@@ -282,7 +275,7 @@ var Paint = (function(document) {
         var red = parseInt(""+pix[0], 16);
         var green = parseInt(""+pix[1], 16);
         var blue = parseInt(""+pix[2], 16);
-        colors[0].value = "#" + red + green + blue;
+        colors[0] = "#" + red + green + blue;
     }
 
     function drawImage() {
@@ -295,7 +288,7 @@ var Paint = (function(document) {
         var colorChooser = document.createElement("input");
         colorChooser.setAttribute("type", "color");
         colorChooser.addEventListener("change", function() {
-            colors[0].value = this.value;
+            colors[0] = this.value;
         });
 
 
@@ -433,7 +426,7 @@ var Paint = (function(document) {
                 if(red.length == 1) red = "0" + ("" + red);
                 if(green.length == 1) green = "0" + ("" + green);
                 if(blue.length == 1) blue = "0" + ("" + blue);
-                colors[0].value = "#" + red + green + blue;
+                colors[0] = "#" + red + green + blue;
                 break;
             case "color":
                 // test on further integration
@@ -452,6 +445,12 @@ var Paint = (function(document) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
         });
     }
+
+    Paint.prototype.clearCurrentLayer = function() {
+        currentLayer.getCanvasContext().clearRect(0,0,
+                            currentLayer.getCanvas().width,
+                            currentLayer.getCanvas().height);
+    };
 
     return Paint;
 })(document);

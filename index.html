@@ -16,59 +16,59 @@
 <body>
     <header class="titlebar frame">
         <div class="title-item title-left" id="palette">
-            <img src="assets/images/tools.png" alt="Tools">
+            <img src="assets/images/tools.png" alt="Tools" data-bind="click: togglePalette">
         </div>
         <div class="title-item title-left" id="clear-screen">
-            <img src="assets/images/bomb.png" alt="Clear">
+            <img src="assets/images/bomb.png" alt="Clear" data-bind="click: clearCanvas">
         </div>
         <div class="title-item title-left" id="save">
-            <img src="assets/images/save.png" alt="Save">
+            <img src="assets/images/save.png" alt="Save" data-bind="click: saveDrawing">
         </div>
         <div class="title-padding"></div>
         <div class="title">KL Paint</div>
         <div class="title-item title-right" id="undo">
-            <img src="assets/images/undo.png" alt="undo" />
+            <img src="assets/images/undo.png" alt="undo" data-bind="click: undo">
         </div>
         <div class="title-item title-right" id="redo">
-            <img src="assets/images/redo.png" alt="redo" />
+        <img src="assets/images/redo.png" alt="redo" data-bind="click: redo">
         </div>
         <div class="title-item title-right" id="layers-panel">
-            <img src="assets/images/layers.png" alt="Layers">
+            <img src="assets/images/layers.png" alt="Layers" data-bind="click: toggleLayers">
         </div>
         <div class="title-item title-right" id="history-panel">
-            <img src="assets/images/history.png" alt="History">
+            <img src="assets/images/history.png" alt="History" data-bind="click: toggleHistory">
         </div>
     </header>
-    <div class="toolbar frame" id="toolbar">
+    <div class="toolbar frame" id="toolbar" data-bind="visible: paletteVisible">
         <div class="toolbox">
-            <input type="radio" id="pencil" name="tool-selection" value="pencil" checked>
+            <input type="radio" id="pencil" name="tool-selection" value="pencil" data-bind="checked: selectedTool">
             <label for="pencil"><img src="assets/images/pencil.png" alt="pencil"></label>
 
-            <input type="radio" id="brush" name="tool-selection" value="brush">
+            <input type="radio" id="brush" name="tool-selection" value="brush" data-bind="checked: selectedTool">
             <label for="brush"><img src="assets/images/brush.png" alt="brush"></label>
 
-            <input type="radio" id="circle" name="tool-selection" value="circle">
+            <input type="radio" id="circle" name="tool-selection" value="circle" data-bind="checked: selectedTool">
             <label for="circle"><img src="assets/images/circle.png" alt="circle"></label>
 
-            <input type="radio" id="square" name="tool-selection" value="square">
+            <input type="radio" id="square" name="tool-selection" value="square" data-bind="checked: selectedTool">
             <label for="square"><img src="assets/images/square.png" alt="square"></label>
 
-            <input type="radio" id="line" name="tool-selection" value="line">
+            <input type="radio" id="line" name="tool-selection" value="line" data-bind="checked: selectedTool">
             <label for="line"><img src="assets/images/line.png" alt="line"></label>
 
-            <input type="radio" id="text" name="tool-selection" value="text">
+            <input type="radio" id="text" name="tool-selection" value="text" data-bind="checked: selectedTool">
             <label for="text"><img src="assets/images/text.png" alt="text"></label>
 
-            <input type="radio" id="eraser" name="tool-selection" value="eraser">
+            <input type="radio" id="eraser" name="tool-selection" value="eraser" data-bind="checked: selectedTool">
             <label for="eraser"><img src="assets/images/eraser.png" alt="eraser"></label>
 
-            <input type="radio" id="dropper" name="tool-selection" value="dropper">
+            <input type="radio" id="dropper" name="tool-selection" value="dropper" data-bind="checked: selectedTool">
             <label for="dropper"><img src="assets/images/dropper.png" alt="dropper"></label>
 
-            <input type="radio" id="color" name="tool-selection" value="color">
+            <input type="radio" id="color" name="tool-selection" value="color" data-bind="checked: selectedTool">
             <label for="color"><img src="assets/images/color.png" alt="color"></label>
 
-            <input type="radio" id="image" name="tool-selection" value="image">
+            <input type="radio" id="image" name="tool-selection" value="image" data-bind="checked: selectedTool">
             <label for="image"><img src="assets/images/image.png" alt="image"></label>
             <div class="color">
                 <input type="color" class="color-selection" id="primary-color" />
@@ -92,8 +92,8 @@
         <!-- <canvas class="layer" id="worker"></canvas> -->
         <!-- <canvas class="layer" id=""></canvas> -->
     </section>
-    <div class="sidebar frame">
-        <div class="layers" id="layers">
+    <div class="sidebar frame" data-bind="visible: sidebarVisible">
+        <div class="layers" id="layers" data-bind="visible: layersVisible">
             <ul class="layer-list" id="layer-list">
                 <!-- Examples -->
                 <!-- <li class="layer-list-item" id="layer1">
@@ -112,7 +112,7 @@
                 </li>
             </ul>
         </div>
-        <div class="layer-history" id="history">
+        <div class="layer-history" id="history" data-bind="visible: historyVisible">
             <ul class="history-tree">
                 <!-- Examples -->
                 <li class="history-level">
