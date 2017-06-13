@@ -35,13 +35,15 @@
 // }
 
 var History = (function() {
-    var root;
 
     var HistoryNode = (function() {
-        var action;
-
-        function HistoryNode(action) {
-            this.action = action;
+        function HistoryNode(action, color, fill, x, y, points) {
+            this.tool = tool;
+            this.color = color;
+            this.fill = fill;
+            this.rootX = x;
+            this.rootY = y;
+            this.points = points;
         }
 
         return HistoryNode;
@@ -56,46 +58,55 @@ var History = (function() {
 
 
 var Layer = (function(document) {
-    var id;
-    var canvas;
-    var context;
-    var history;
 
     /**
         Creates a model for a layer, creating the associated canvas and
         inserting it into the DOM.
     */
     function Layer(parent, lid) {
-        id = lid;
-        canvas = document.createElement("canvas");
-        canvas.width = parent.offsetWidth;
-        canvas.height = parent.offsetHeight;
-        canvas.style.position = "absolute";
-        canvas.style.left = 0;
-        canvas.style.top = 0;
+        this.id = lid;
+        this.name = "Layer " + lid;
+        this.canvas = document.createElement("canvas");
+        this.canvas.width = parent.offsetWidth;
+        this.canvas.height = parent.offsetHeight;
+        this.canvas.style.position = "absolute";
+        this.canvas.style.left = 0;
+        this.canvas.style.top = 0;
 
-        parent.insertBefore(canvas, parent.firstChild);
+        parent.insertBefore(this.canvas, parent.firstChild);
 
-        context = canvas.getContext("2d");
+        this.context = this.canvas.getContext("2d");
     }
 
     Layer.prototype.getID = function() {
-        return id;
+        return this.id;
+    }
+
+    Layer.prototype.getName = function() {
+        return this.name;
+    }
+
+    Layer.prototype.setName = function(n) {
+        this.name = n;
     }
 
     Layer.prototype.getCanvas = function() {
-        return canvas;
+        return this.canvas;
     }
 
     Layer.prototype.getCanvasContext = function() {
-        return context;
+        return this.context;
     }
 
+
+
     Layer.prototype.finalize = function() {
-        id = -1;
-        name = null;
-        canvas.remove();
-        canvas = null;
+        this.id = -1;
+        this.name = null;
+        console.log(this.canvas.parentElement);
+        this.canvas.parentNode.removeChild(this.canvas);
+        this.canvas = null;
+        this.context = null;
     }
 
 

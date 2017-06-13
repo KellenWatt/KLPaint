@@ -114,6 +114,25 @@
             paint.setFill(f);
         });
         this.fillValue(false);
+
+        this.layerList = ko.observableArray(paint.getLayers());
+
+        this.newLayer = function() {
+            self.layerList(paint.addLayer());
+        };
+
+        this.selectedLayerIndex = ko.observable(0);
+        this.selectLayer = function(index) {
+            paint.setLayer(self.layerList()[index].id)
+            self.selectedLayerIndex(index);
+        };
+
+        this.deleteLayer = function() {
+            var index = self.selectedLayerIndex();
+            self.selectedLayerIndex(index > 0 ? index-1 : index);
+            self.layerList(paint.deleteLayer(self.layerList()[index].id));
+            paint.setLayer(self.layerList()[index > 0 ? index-1 : index].id);
+        };
     }
 
     ko.applyBindings(PaintViewModel());

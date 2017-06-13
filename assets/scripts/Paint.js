@@ -17,7 +17,7 @@ var Paint = (function(document) {
 
     var _layerCounter = 0;
 
-    var cb;
+    var colorcb;
 
     function Point(x, y) {
         this.x = x;
@@ -55,15 +55,9 @@ var Paint = (function(document) {
         canvas.style.left = 0;
         canvas.style.top = 0;
         workspace.appendChild(canvas);
-        currentLayer = this.addLayer();
+        currentLayer = this.addLayer()[0];
 
         ctx = canvas.getContext("2d");
-
-        ctx.fillStyle = primary.value;
-        currentLayer.getCanvasContext().fillStyle = primary.value;
-
-        ctx.strokeStyle = secondary.value;
-        currentLayer.getCanvasContext().strokeStyle = secondary.value;
 
         ctx.lineWidth = weight;
         currentLayer.getCanvasContext().lineWidth = weight;
@@ -91,7 +85,7 @@ var Paint = (function(document) {
 
     Paint.prototype.setPrimaryColor = function(primary) {
         colors[0] = primary;
-        if(cb) cb();
+        if(colorcb) colorcb();
 
         ctx.fillStyle = primary;
         currentLayer.getCanvasContext().fillStyle = primary;
@@ -99,7 +93,7 @@ var Paint = (function(document) {
 
     Paint.prototype.setSecondaryColor = function(secondary) {
         colors[1] = secondary;
-        if(cb) cb();
+        if(colorcb) colorcb();
 
         ctx.strokeStyle = secondary;
         currentLayer.getCanvasContext().strokeStyle = secondary;
@@ -107,7 +101,7 @@ var Paint = (function(document) {
 
     Paint.prototype.setColors = function(primary, secondary) {
         colors = [primary, secondary];
-        if(cb) cb();
+        if(colorcb) colorcb();
 
         ctx.fillStyle = primary;
         currentLayer.getCanvasContext().fillStyle = primary;
@@ -128,7 +122,7 @@ var Paint = (function(document) {
     Paint.prototype.addLayer = function() {
         var newLayer = new Layer(workspace, ++_layerCounter);
         layers.push(newLayer);
-        return newLayer;
+        return layers;
     };
 
     Paint.prototype.deleteLayer = function(id) {
@@ -136,22 +130,34 @@ var Paint = (function(document) {
             if(layers[i].id === id) {
                 layers[i].finalize();
                 layers.splice(i, 1);
-                return;
+                break;
             }
         }
+        return layers;
     };
 
     Paint.prototype.setLayer = function(id) {
         for(var i=0; i < layers.length; i++) {
             if(layers[i].id === id) {
                 currentLayer = layers[i];
-                return;
+                break;
             }
         }
+        currentLayer.getCanvasContext().fillStyle = ctx.fillStyle;
+        currentLayer.getCanvasContext().strokeStyle = ctx.strokeStyle;
+        currentLayer.getCanvasContext().lineWidth = weight;
     };
 
     Paint.prototype.getLayers = function() {
         return layers;
+    };
+
+    Paint.prototype.getLayerNames = function() {
+        var names = [];
+        for(var i=0; i<layers.length; i++) {
+            names.push({name: layers[i].name});
+        }
+        return names;
     };
 
     Paint.prototype.setWeight = function(wt) {

@@ -96,19 +96,19 @@
     </section>
     <div class="sidebar frame" data-bind="visible: sidebarVisible">
         <div class="layers" id="layers" data-bind="visible: layersVisible">
-            <ul class="layer-list" id="layer-list">
-                <!-- Examples -->
-                <!-- <li class="layer-list-item" id="layer1">
-                        <img src="assets/images/visible.png" alt="visible">
-                        Layer 1
-                    </li> -->
-                <!-- End Examples -->
+            <ul class="layer-list" id="layer-list" >
+                <!-- ko foreach:layerList -->
+                <li class="layer-list-item" data-bind="click: selectLayer.bind($data, $index()), css: {'layer-list-item-selected': selectedLayerIndex() === $index()}">
+                    <img src="assets/images/visible.png" alt="visible" />
+                    <span data-bind="text: name, css:{'bold-text': selectedLayerIndex() === $index()}" ></span>
+                </li>
+                <!-- /ko -->
                 <!-- TODO: Move these outside the list; -->
                 <li class="layer-list-item layer-controls">
-                    <div class="layer-action" id="create-layer">
+                    <div class="layer-action" id="create-layer" data-bind="click: newLayer">
                         <img src="assets/images/add.png" alt="add layer">
                     </div>
-                    <div class="layer-action" id="delete-layer">
+                    <div class="layer-action" id="delete-layer" data-bind="click: deleteLayer">
                         <img src="assets/images/trash.png" alt="add layer">
                     </div>
                 </li>
