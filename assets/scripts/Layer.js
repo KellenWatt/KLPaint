@@ -37,21 +37,28 @@
 var History = (function() {
 
     var HistoryNode = (function() {
-        function HistoryNode(action, color, fill, x, y, points) {
+        function HistoryNode(tool, color, fill, x, y, points) {
             this.tool = tool;
             this.color = color;
             this.fill = fill;
             this.rootX = x;
             this.rootY = y;
             this.points = points;
+
+            this.age = 0;
+            this.children = [];
         }
 
         return HistoryNode;
     }());
 
     function History() {
-        this.root = new HistoryNode();
+        this.root = new HistoryNode(null, null, null, null, null);
     }
+
+    History.prototype.addAction = function(tool, color, fill, x, y, points) {
+
+    };
 
     return History;
 }());
@@ -76,6 +83,8 @@ var Layer = (function(document) {
         parent.insertBefore(this.canvas, parent.firstChild);
 
         this.context = this.canvas.getContext("2d");
+
+        this.history = new History();
     }
 
     Layer.prototype.getID = function() {
@@ -103,7 +112,6 @@ var Layer = (function(document) {
     Layer.prototype.finalize = function() {
         this.id = -1;
         this.name = null;
-        console.log(this.canvas.parentElement);
         this.canvas.parentNode.removeChild(this.canvas);
         this.canvas = null;
         this.context = null;

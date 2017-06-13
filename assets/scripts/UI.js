@@ -59,7 +59,9 @@
         });
 
         self.clearCanvas = function() {
-            paint.clearCurrentLayer();
+            // paint.clearCurrentLayer();
+            self.layerList(paint.nuke());
+            self.selectedLayerIndex(0);
         };
 
         self.saveDrawing = function() {
@@ -128,10 +130,12 @@
         };
 
         this.deleteLayer = function() {
-            var index = self.selectedLayerIndex();
-            self.selectedLayerIndex(index > 0 ? index-1 : index);
-            self.layerList(paint.deleteLayer(self.layerList()[index].id));
-            paint.setLayer(self.layerList()[index > 0 ? index-1 : index].id);
+            if(paint.getLayers().length > 1) {
+                var index = self.selectedLayerIndex();
+                self.selectedLayerIndex(index > 0 ? index-1 : index);
+                self.layerList(paint.deleteLayer(self.layerList()[index].id));
+                paint.setLayer(self.layerList()[index > 0 ? index-1 : index].id);
+            }
         };
     }
 

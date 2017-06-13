@@ -55,6 +55,7 @@ var Paint = (function(document) {
         canvas.style.left = 0;
         canvas.style.top = 0;
         workspace.appendChild(canvas);
+
         currentLayer = this.addLayer()[0];
 
         ctx = canvas.getContext("2d");
@@ -467,7 +468,8 @@ var Paint = (function(document) {
             layers[i].finalize();
         }
         layers = [];
-        this.addLayer();
+        currentLayer = self.addLayer()[0];
+        return layers;
     }
 
     return Paint;
