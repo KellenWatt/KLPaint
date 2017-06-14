@@ -1,4 +1,4 @@
-(function(document, ko, jq) {
+(function(document, ko, $) {
     // Paint declaration pre-reqs
     var drawspace = document.getElementById("drawspace");
     var color = document.getElementById("primary-color");
@@ -68,11 +68,12 @@
             // do server-side thing here
         };
 
-        self.undo = function() {
+        self.undo = function(version) {
             // undo previous thing on current layer
+
         };
 
-        self.redo = function () {
+        self.redo = function(index, version) {
             // redo thing on current layer
         }
 
@@ -137,6 +138,8 @@
                 paint.setLayer(self.layerList()[index > 0 ? index-1 : index].id);
             }
         };
+
+
     }
 
     ko.applyBindings(PaintViewModel());
@@ -148,4 +151,4 @@
     // End of other stuff
     // ...
     // What? Are you expecting more?
-})(document, ko, $);
+})(document, ko, jQuery);

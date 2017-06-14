@@ -34,34 +34,85 @@
 //
 // }
 
-var History = (function() {
+var PaintHistory = (function() {
 
+    // Begin HistoryNode
     var HistoryNode = (function() {
-        function HistoryNode(tool, color, fill, x, y, points) {
+        function HistoryNode(tool, color, fill, x, y, dx, dy, image, points) {
             this.tool = tool;
             this.color = color;
             this.fill = fill;
             this.rootX = x;
+            this.changeX = dx;
             this.rootY = y;
+            this.changeY = dy;
+            this.image = image;
             this.points = points;
-
-            this.age = 0;
-            this.children = [];
         }
 
         return HistoryNode;
-    }());
+    })();
+    // End HistoryNode
+    // Begin HistoryLayer
+    var HistoryLayer = (function() {
+        function HistoryLayer() {
+            this.children = [];
+        }
 
-    function History() {
-        this.root = new HistoryNode(null, null, null, null, null);
+        HistoryLayer.prototype.addAction = function(node) {
+            this.children.push(node);
+            if(this.children.length > 2) {
+                this.children.shift();
+            }
+        };
+
+        return HistoryLayer;
+    })();
+    // End HistoryLayer
+
+    function PaintHistory() {
+        this.states = [];
+        this.states.push(new HistoryLayer());
+        this.states[0].addAction(new HistoryNode(null, null, null, null, null, null));
+        this.currentLayer = 0;
+        this.version = 0;
     }
 
-    History.prototype.addAction = function(tool, color, fill, x, y, points) {
+    function addHistoryLayer() {
+        this.states.push(new HistoryLayer());
+    }
 
+    PaintHistory.prototype.pushAction = function(tool, color, fill, x, y, dx, dy, image, points) {
+        this.states.push(new HistoryLayer());
+        this.currentLayer += 1;
+
+        this.states[this.currentLayer].addAction(
+            new HistoryNode(tool, color, fill, x, y, dx, dy, image, points));
+        console.log(this.states);
     };
 
-    return History;
-}());
+    PaintHistory.prototype.undo = function(version) {
+        if(this.currentLayer != 0) {
+            this.inPrevState = true;
+            this.currentLayer -= 1;
+            this.version = version;
+        }
+    };
+
+    PaintHistory.prototype.redo = function(index, version) {
+        this.currentLayer = index;
+        this.version = version;
+        if(index == this.states.length-1) {
+            this.inPrevState = false;
+        }
+    };
+
+    PaintHistory.prototype.fullHistory = function() {
+        return this.states;
+    };
+
+    return PaintHistory;
+})();
 
 
 var Layer = (function(document) {
@@ -84,7 +135,7 @@ var Layer = (function(document) {
 
         this.context = this.canvas.getContext("2d");
 
-        this.history = new History();
+        this.history = new PaintHistory();
     }
 
     Layer.prototype.getID = function() {
@@ -120,4 +171,4 @@ var Layer = (function(document) {
 
 
     return Layer;
-}(document));
+})(document);
