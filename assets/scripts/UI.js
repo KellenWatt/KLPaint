@@ -67,7 +67,14 @@
         };
 
         self.download = function() {
-            // do server-side thing here
+            var link = document.createElement("a");
+            link.href = paint.render();
+            link.download = "MyDrawing.png";
+            link.click();
+        };
+
+        self.upload = function() {
+
         };
 
         self.toolbarUndo = function() {

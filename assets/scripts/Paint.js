@@ -576,5 +576,17 @@ var Paint = (function(document) {
         return mouseMoved;
     };
 
+    Paint.prototype.render = function() {
+        var image = document.createElement("canvas");
+        image.width = canvas.width;
+        image.height = canvas.height;
+        var imgctx = image.getContext("2d");
+        for(var i=layers.length-1; i>=0; i--) {
+            imgctx.drawImage(layers[i].getCanvas(), 0, 0);
+        }
+
+        return image.toDataURL();
+    };
+
     return Paint;
 })(document);
