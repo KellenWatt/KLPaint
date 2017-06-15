@@ -38,10 +38,11 @@ var PaintHistory = (function() {
 
     // Begin HistoryNode
     var HistoryNode = (function() {
-        function HistoryNode(tool, color, fill, x, y, dx, dy, image, points) {
+        function HistoryNode(tool, color, fill, weight, x, y, dx, dy, image, points) {
             this.tool = tool;
             this.color = color;
             this.fill = fill;
+            this.weight = weight;
             this.rootX = x;
             this.changeX = dx;
             this.rootY = y;
@@ -56,14 +57,24 @@ var PaintHistory = (function() {
     // Begin HistoryLayer
     var HistoryLayer = (function() {
         function HistoryLayer() {
-            this.children = [];
+            this.versions = [];
+            this.selectedVersion = 0;
         }
 
         HistoryLayer.prototype.addAction = function(node) {
-            this.children.push(node);
-            if(this.children.length > 2) {
-                this.children.shift();
+            this.versions.push(node);
+            if(this.versions.length > 2) {
+                this.versions.shift();
             }
+            this.selectedVersion = this.versions.length-1;
+        };
+
+        HistoryLayer.prototype.getVersion = function() {
+            return this.versions[this.selectedVersion];
+        };
+
+        HistoryLayer.prototype.getBranchCount = function() {
+            return this.versions.length;
         };
 
         return HistoryLayer;
@@ -72,43 +83,75 @@ var PaintHistory = (function() {
 
     function PaintHistory() {
         this.states = [];
-        this.states.push(new HistoryLayer());
-        this.states[0].addAction(new HistoryNode(null, null, null, null, null, null));
         this.currentLayer = 0;
         this.version = 0;
+        this.inPrevState = false;
     }
 
-    function addHistoryLayer() {
+    PaintHistory.prototype.init = function(image) {
         this.states.push(new HistoryLayer());
-    }
-
-    PaintHistory.prototype.pushAction = function(tool, color, fill, x, y, dx, dy, image, points) {
-        this.states.push(new HistoryLayer());
-        this.currentLayer += 1;
-
-        this.states[this.currentLayer].addAction(
-            new HistoryNode(tool, color, fill, x, y, dx, dy, image, points));
-        console.log(this.states);
+        this.states[0].addAction(new HistoryNode("Empty", null, null, null, null, null, null, null, image, null));
     };
 
-    PaintHistory.prototype.undo = function(version) {
+    PaintHistory.prototype.pushAction = function(tool, color, fill, weight, x, y, dx, dy, image, points) {
+        if(!this.inPrevState) {
+            this.states.push(new HistoryLayer());
+        }
+        this.currentLayer += 1;
+        if(this.currentLayer == this.states.length-1) {
+            this.inPrevState = false;
+        }
+
+        this.states[this.currentLayer].addAction(
+            new HistoryNode(tool, color, fill, weight, x, y, dx, dy, image, points));
+    };
+
+    PaintHistory.prototype.undo = function(index, version) {
         if(this.currentLayer != 0) {
             this.inPrevState = true;
-            this.currentLayer -= 1;
+            this.currentLayer = index;
             this.version = version;
         }
     };
 
+    PaintHistory.prototype.quickUndo = function() {
+        if(this.currentLayer != 0) {
+            this.inPrevState = true;
+            this.currentLayer -= 1;
+            this.version = this.states[this.currentLayer].selectedVersion;
+        }
+    };
+
     PaintHistory.prototype.redo = function(index, version) {
-        this.currentLayer = index;
-        this.version = version;
-        if(index == this.states.length-1) {
-            this.inPrevState = false;
+        if(this.currentLayer != this.states.length-1){
+            this.currentLayer = index;
+            this.version = version;
+            if(index == this.states.length-1) {
+                this.inPrevState = false;
+            }
+        }
+    };
+
+    PaintHistory.prototype.quickRedo = function() {
+        if(this.currentLayer != this.states.length-1) {
+            this.currentLayer += 1;
+            this.version = this.states[this.currentLayer].selectedVersion;
+            if(this.currentLayer == this.states.length-1) {
+                this.inPrevState = false;
+            }
         }
     };
 
     PaintHistory.prototype.fullHistory = function() {
         return this.states;
+    };
+
+    PaintHistory.prototype.getCurrentState = function() {
+        return this.states[this.currentLayer];
+    };
+
+    PaintHistory.prototype.getImage = function() {
+        return this.states[this.currentLayer].getVersion().image;
     };
 
     return PaintHistory;

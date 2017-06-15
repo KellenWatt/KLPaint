@@ -365,6 +365,8 @@
     width: @sidebar-item-width;
     height: @content-height;
     background-color: white;
+    overflow-y: auto;
+
 }
 
 .history-level {
@@ -389,6 +391,10 @@
     .edge(right, @tool-grey);
 
     &:hover {
+        background-color: @lightgrey;
+    }
+
+    &-selected {
         background-color: @lightgrey;
     }
 

@@ -21,7 +21,7 @@
             <img src="assets/images/tools.png" alt="Tools" data-bind="click: togglePalette">
         </div>
         <div class="title-item title-left" id="clear-screen">
-            <img src="assets/images/bomb.png" alt="Clear" data-bind="click: clearCanvas">
+            <img src="assets/images/bomb.png" alt="Clear" data-bind="click: nukeProject">
         </div>
         <div class="title-item title-left" id="save">
             <img src="assets/images/save.png" alt="Save" data-bind="click: saveDrawing">
@@ -29,10 +29,10 @@
         <div class="title-padding"></div>
         <div class="title">KL Paint</div>
         <div class="title-item title-right" id="undo">
-            <img src="assets/images/undo.png" alt="undo" data-bind="click: undo">
+            <img src="assets/images/undo.png" alt="undo" data-bind="click: toolbarUndo">
         </div>
         <div class="title-item title-right" id="redo">
-        <img src="assets/images/redo.png" alt="redo" data-bind="click: redo">
+        <img src="assets/images/redo.png" alt="redo" data-bind="click: toolbarRedo">
         </div>
         <div class="title-item title-right" id="layers-panel">
             <img src="assets/images/layers.png" alt="Layers" data-bind="click: toggleLayers">
@@ -92,7 +92,7 @@
             </div>
         </div>
     </div>
-    <section id="drawspace"></section>
+    <section id="drawspace" data-bind="event: {mouseup: updateHistory}"></section>
     <div class="sidebar frame" data-bind="visible: sidebarVisible">
         <div class="layers" id="layers" data-bind="visible: layersVisible">
             <ul class="layer-list" id="layer-list" >
@@ -114,22 +114,13 @@
             </ul>
         </div>
         <div class="layer-history" id="history" data-bind="visible: historyVisible">
-            <ul class="history-tree">
-                <!-- Examples -->
+            <ul class="history-tree" data-bind="foreach: historyLayers">
                 <li class="history-level">
-                    <div class="history-node">
-                        action
-                    </div>
+                    <div class="history-node" data-bind="text: $data.versions[0].tool, click: selectHistoryUnit.bind($data, $index(), 0), css: {'bold-text': selectedHistoryUnit().index == $index() && selectedHistoryUnit().version == 0,'history-node-selected': selectedHistoryUnit().index == $index() && selectedHistoryUnit().version == 0}"> action </div>
+                    <!-- ko if: $data.versions.length === 2 -->
+                    <div class="history-node" data-bind="text: $data.versions[1].tool, click: selectHistoryUnit.bind($data, $index(), 1), css: {'bold-text': selectedHistoryUnit().index == $index() && selectedHistoryUnit().version == 1,'history-node-selected': selectedHistoryUnit().index == $index() && selectedHistoryUnit().version == 1}"> replacement</div>
+                    <!-- /ko -->
                 </li>
-                <li class="history-level">
-                    <div class="history-node"> action </div>
-                    <div class="history-node"> replacement</div>
-                </li>
-                <li class="history-level">
-                    <div class="history-node">action</div>
-                    <div class="history-node">edit</div>
-                </li>
-                <!-- End Examples -->
             </ul>
         </div>
     </div>
