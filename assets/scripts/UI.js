@@ -66,7 +66,7 @@
             self.selectedHistoryUnit({index: 0, version: 0});
         };
 
-        self.saveDrawing = function() {
+        self.download = function() {
             // do server-side thing here
         };
 
@@ -161,8 +161,10 @@
             self.historyLayers([]);
             self.historyLayers(paint.getCurrentLayer().history.fullHistory());
             var ver = 0;
-            self.selectedHistoryUnit({index: self.selectedHistoryUnit().index + 1,
+            if(paint.changed()){
+                self.selectedHistoryUnit({index: self.selectedHistoryUnit().index + 1,
                                       version: ver});
+            }
         };
 
         this.selectedHistoryUnit = ko.observable({
@@ -171,12 +173,11 @@
         });
 
         this.selectHistoryUnit = function(i, v) {
-            if(i > self.selectedHistoryUnit().index) {
+            console.log(i, self.selectedHistoryUnit().index)
+            if(i >= self.selectedHistoryUnit().index) {
                 paint.redo(i,v);
-            } else if(i < self.selectedHistoryUnit().index) {
-                paint.undo(i,v);
             } else {
-                paint.redo(i,v);
+                paint.undo(i,v);
             }
             self.selectedHistoryUnit({index: i, version: v});
 

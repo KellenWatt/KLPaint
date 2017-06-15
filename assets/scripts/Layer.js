@@ -69,8 +69,8 @@ var PaintHistory = (function() {
             this.selectedVersion = this.versions.length-1;
         };
 
-        HistoryLayer.prototype.getVersion = function() {
-            return this.versions[this.selectedVersion];
+        HistoryLayer.prototype.getVersion = function(version) {
+            return this.versions[version];
         };
 
         HistoryLayer.prototype.getBranchCount = function() {
@@ -150,8 +150,8 @@ var PaintHistory = (function() {
         return this.states[this.currentLayer];
     };
 
-    PaintHistory.prototype.getImage = function() {
-        return this.states[this.currentLayer].getVersion().image;
+    PaintHistory.prototype.getImage = function(version) {
+        return this.states[this.currentLayer].getVersion(version).image;
     };
 
     return PaintHistory;

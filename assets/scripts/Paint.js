@@ -26,6 +26,7 @@ var Paint = (function(document) {
 
     var mouse = new Point(0, 0);
     var mouseLock = new Point(0, 0);
+    var mouseMoved = false;
 
     var points  = [];
     var self;
@@ -199,6 +200,7 @@ var Paint = (function(document) {
 
     // Begin drawing functions
     function drawPencil() {
+        mouseMoved = true;
         ctx.lineTo(mouse.x, mouse.y);
         ctx.stroke();
         points.push(new Point(mouse.x, mouse.y));
@@ -210,6 +212,7 @@ var Paint = (function(document) {
       return Math.atan2( point2.x - point1.x, point2.y - point1.y );
     }
     function drawBrush() {
+        mouseMoved = true;
         var dist = distanceBetween(mouseLock, mouse);
         var angle = angleBetween(mouseLock, mouse);
 
@@ -237,6 +240,7 @@ var Paint = (function(document) {
     }
 
     function drawCircle() {
+        mouseMoved = true;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.beginPath();
         var radius = Math.sqrt(Math.pow(mouse.x - mouseLock.x, 2) +
@@ -250,6 +254,7 @@ var Paint = (function(document) {
     }
 
     function drawRectangle() {
+        mouseMoved = true;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.beginPath();
         ctx.rect(mouseLock.x, mouseLock.y,
@@ -262,6 +267,7 @@ var Paint = (function(document) {
     }
 
     function drawLine() {
+        mouseMoved = true;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.beginPath();
         ctx.moveTo(mouseLock.x, mouseLock.y);
@@ -270,6 +276,7 @@ var Paint = (function(document) {
     }
 
     function drawText() { // need to work on this more
+        mouseMoved = true;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.beginPath();
         ctx.rect(mouseLock.x, mouseLock.y,
@@ -278,6 +285,7 @@ var Paint = (function(document) {
     }
 
     function erase() {
+        mouseMoved = true;
         // var context = currentLayer.getCanvasContext();
         // context.save();
         // context.arc(mouse.x, mouse.y, weight, 0, 2*Math.PI, true);
@@ -292,6 +300,7 @@ var Paint = (function(document) {
 
 
     function drawImage() {
+        mouseMoved = true;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(image, mouseLock.x, mouseLock.y,
                              mouse.x - mouseLock.x, mouse.y - mouseLock.y);
@@ -313,6 +322,7 @@ var Paint = (function(document) {
             ctx.moveTo(mouse.x, mouse.y);
             mouseLock.x = mouse.x;
             mouseLock.y = mouse.y;
+            mouseMoved = false;
 
             switch(currentTool) {
             case "pencil":
@@ -385,9 +395,11 @@ var Paint = (function(document) {
                 }else {
                     currentLayer.getCanvasContext().drawImage(canvas, 0, 0);
                 };
+                if(mouseMoved) {
                 currentLayer.history.pushAction("pencil", fill ? colors[0] : colors[1],
                     fill, weight, mouseLock.x, mouseLock.y, mouse.x-mouseLock.x,
                     mouse.y-mouseLock.y, currentLayer.getCanvas().toDataURL(), points);
+                }
                 points = [];
                 canvas.removeEventListener("mousemove", drawPencil);
                 break;
@@ -395,32 +407,41 @@ var Paint = (function(document) {
                 canvas.removeEventListener("mousemove", drawBrush);
                 ctx.restore();
                 currentLayer.getCanvasContext().drawImage(canvas, 0, 0);
+
+                if(mouseMoved){
                 currentLayer.history.pushAction("brush", colors[0], null, weight,
                     mouseLock.x, mouseLock.y, mouse.x-mouseLock.x, mouse.y-mouseLock.y,
                     currentLayer.getCanvas().toDataURL(), points);
+                }
                 points = [];
                 break;
             case "circle":
                 canvas.removeEventListener("mousemove", drawCircle);
                 currentLayer.getCanvasContext().drawImage(canvas, 0, 0);
+                if(mouseMoved){
                 currentLayer.history.pushAction("circle", fill ? colors[0] : colors[1],
                     fill, weight, mouseLock.x, mouseLock.y, mouse.x-mouseLock.x,
                     mouse.y-mouseLock.y, currentLayer.getCanvas().toDataURL());
+                }
                 break;
             case "square":
                 canvas.removeEventListener("mousemove", drawRectangle);
                 ctx.restore();
                 currentLayer.getCanvasContext().drawImage(canvas, 0, 0);
+                if(mouseMoved){
                 currentLayer.history.pushAction("square", fill ? colors[0] : colors[1],
                     fill, weight, mouseLock.x, mouseLock.y, mouse.x-mouseLock.x,
                     mouse.y-mouseLock.y, currentLayer.getCanvas().toDataURL());
+                }
                 break;
             case "line":
                 canvas.removeEventListener("mousemove", drawLine);
                 currentLayer.getCanvasContext().drawImage(canvas, 0, 0);
+                if(mouseMoved){
                 currentLayer.history.pushAction("line", colors[1], null, weight,
                     mouseLock.x, mouseLock.y, mouse.x-mouseLock.x, mouse.y-mouseLock.y,
                     currentLayer.getCanvas().toDataURL());
+                }
                 break;
             case "text":
             // TODO: Definitely need to look at this more
@@ -436,9 +457,11 @@ var Paint = (function(document) {
                 textBox.addEventListener("blur", function() {
                     currentLayer.getCanvasContext().fillText(textBox.value,
                         mouseLock.x, mouseLock.y, mouse.x - mouseLock.x);
+                    if(mouseMoved){
                     currentLayer.history.pushAction("text", colors[0], null, weight,
                         mouseLock.x, mouseLock.y, mouse.x-mouseLock.x, mouse.y-mouseLock.y,
                         currentLayer.getCanvas().toDataURL());
+                    }
                     textBox.remove();
                 });
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -448,9 +471,11 @@ var Paint = (function(document) {
                 // test on further integration
                 canvas.removeEventListener("mousemove", erase);
                 currentLayer.getCanvasContext().restore();
+                if(mouseMoved){
                 currentLayer.history.pushAction("eraser", colors[0], fill, weight,
                     mouseLock.x, mouseLock.y, mouse.x-mouseLock.x, mouse.y-mouseLock.y,
                     currentLayer.getCanvas().toDataURL(), points);
+                }
                 points = [];
                 break;
             case "dropper":
@@ -474,9 +499,11 @@ var Paint = (function(document) {
             case "image":
                 canvas.removeEventListener("mousemove", drawImage);
                 currentLayer.getCanvasContext().drawImage(canvas, 0, 0);
+                if(mouseMoved){
                 currentLayer.history.pushAction("image", null, null, weight,
                     mouseLock.x, mouseLock.y, mouse.x-mouseLock.x, mouse.y-mouseLock.y,
                     currentLayer.getCanvas().toDataURL());
+                }
                 break;
             default:
                 alert("Invalid tool selection");
@@ -504,6 +531,7 @@ var Paint = (function(document) {
     };
 
     Paint.prototype.undo = function(index, version) {
+        version = typeof version === "undefined" ? 0 : version;
         if(typeof index === "undefined") {
             currentLayer.history.quickUndo();
         } else {
@@ -516,10 +544,11 @@ var Paint = (function(document) {
             currentLayer.getCanvasContext().drawImage(img, 0, 0);
             currentLayer.getCanvasContext().restore();
         })
-        img.src = currentLayer.history.getImage();
+        img.src = currentLayer.history.getImage(version);
     };
 
     Paint.prototype.redo = function(index, version) {
+        version = typeof version === "undefined" ? 0 : version;
         if(typeof index === "undefined") {
             currentLayer.history.quickRedo();
         } else {
@@ -532,7 +561,7 @@ var Paint = (function(document) {
             currentLayer.getCanvasContext().drawImage(img, 0, 0);
             currentLayer.getCanvasContext().restore();
         })
-        img.src = currentLayer.history.getImage();
+        img.src = currentLayer.history.getImage(version);
     };
 
     Paint.prototype.reconstruct = function(jsonstring) {
@@ -541,6 +570,10 @@ var Paint = (function(document) {
 
     Paint.prototype.getCurrentLayer = function() {
         return currentLayer;
+    };
+
+    Paint.prototype.changed = function() {
+        return mouseMoved;
     };
 
     return Paint;
