@@ -509,9 +509,9 @@ var Paint = (function(document) {
         } else {
             currentLayer.history.undo(index, version);
         }
-        currentLayer.getCanvasContext().clearRect(0, 0, canvas.width, canvas.height);
         var img = new Image();
         img.addEventListener("load", function() {
+            currentLayer.getCanvasContext().clearRect(0, 0, canvas.width, canvas.height);
             currentLayer.getCanvasContext().save();
             currentLayer.getCanvasContext().drawImage(img, 0, 0);
             currentLayer.getCanvasContext().restore();
@@ -525,9 +525,9 @@ var Paint = (function(document) {
         } else {
             currentLayer.history.redo(index, version);
         }
-        currentLayer.getCanvasContext().clearRect(0, 0, canvas.width, canvas.height);
         var img = new Image();
         img.addEventListener("load", function() {
+            currentLayer.getCanvasContext().clearRect(0, 0, canvas.width, canvas.height);
             currentLayer.getCanvasContext().save();
             currentLayer.getCanvasContext().drawImage(img, 0, 0);
             currentLayer.getCanvasContext().restore();
