@@ -63,10 +63,10 @@ var Paint = (function(document) {
 
         ctx.lineWidth = weight;
         currentLayer.getCanvasContext().lineWidth = weight;
-        ctx.fillStyle = primary.value;
-        currentLayer.getCanvasContext().fillStyle = primary.value;
-        ctx.strokeStyle = secondary.value;
-        currentLayer.getCanvasContext().strokeStyle = secondary.value;
+        ctx.fillStyle = primary;
+        currentLayer.getCanvasContext().fillStyle = primary;
+        ctx.strokeStyle = secondary;
+        currentLayer.getCanvasContext().strokeStyle = secondary;
         ctx.lineCap = "round";
         ctx.lineJoin = "round";
 
