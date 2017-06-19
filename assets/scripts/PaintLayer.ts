@@ -1,6 +1,6 @@
-import PaintHistory from "./PaintHistory";
+import PaintHistory from "./PaintHistory.js";
 
-export default class Layer {
+class Layer {
     private _id: number;
     private _name: string;
     private _canvas: HTMLCanvasElement;
@@ -53,3 +53,5 @@ export default class Layer {
         this._context = null;
     }
 }
+
+export {Layer};
