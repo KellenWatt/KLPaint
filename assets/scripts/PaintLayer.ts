@@ -1,6 +1,6 @@
 import PaintHistory from "./PaintHistory.js";
 
-class Layer {
+export default class Layer {
     private _id: number;
     private _name: string;
     private _canvas: HTMLCanvasElement;
