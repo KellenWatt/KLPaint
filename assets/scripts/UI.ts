@@ -35,8 +35,11 @@ class PaintViewModel {
         let drawspace = document.getElementById("drawspace");
         this.paint = new Paint(drawspace);
         this.paint.init();
+        this.paint.tool = "pencil";
+        this.paint.weight = 10;
 
         this.fileChooser = document.createElement("input") as HTMLInputElement;
+        this.fileChooser.type = "file";
         this.fileChooser.addEventListener("change", (e) => {
             let file = (e.target as HTMLInputElement).files[0];
             let reader = new FileReader();
@@ -64,10 +67,12 @@ class PaintViewModel {
         this.selectedTool("pencil");
 
         this.primaryColor = ko.observable("#000000");
+        this.primaryColor.subscribe((color: string) => {
+            this.paint.setColors(color, color)
+        })
         this.paint.setColorChangeCallback((primary: boolean, secondary: boolean) => {
             this.primaryColor(this.paint.primaryColor);
         });
-        this.primaryColor("#000000");
 
         this.brushWeight = ko.observable(10);
         this.brushWeight.subscribe((weight) => {
@@ -150,6 +155,18 @@ class PaintViewModel {
         this.historyLayers(this.paint.workingLayer.history.fullHistory());
         this.selectedHistoryUnit({index: this.paint.workingLayer.history.states.length-1,
                                 version: this.paint.workingLayer.history.version});
+    }
+
+    deleteLayer() {
+        if(this.paint.layerList.length > 1) {
+            let index = this.selectedLayerIndex();
+            this.selectedLayerIndex(index > 0 ? index-1 : index);
+            this.layerList(this.paint.deleteLayer(this.layerList()[index].id));
+            this.paint.switchLayer(this.layerList()[index > 0 ? index-1 : index].id);
+            this.historyLayers(this.paint.workingLayer.history.fullHistory());
+            this.selectedHistoryUnit({index: this.paint.workingLayer.history.states.length-1,
+                                    version: this.paint.workingLayer.history.version});
+        }
     }
 
     updateHistory() : void {

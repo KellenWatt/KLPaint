@@ -23,6 +23,8 @@ export default class Paint {
 
     points: Point[];
 
+    toolFunction: () => void;
+
     constructor(workspace: HTMLElement) {
         this.layers = [];
         this.layerCounter = 0;
@@ -34,6 +36,8 @@ export default class Paint {
         this.workspace = workspace;
         this.mouse = new Point(0, 0);
         this.mouseLock = new Point(0, 0);
+
+        this.points = [];
     }
 
     get weight() : number {
@@ -107,7 +111,7 @@ export default class Paint {
     deleteLayer(id: number) : Layer[] {
         for(let i in this.layers) {
             if(this.layers[i].id === id) {
-                this.layers[i].finalize;
+                this.layers[i].finalize();
                 this.layers.splice(+i, 1)
                 break;
             }
@@ -239,12 +243,12 @@ export default class Paint {
         this.mouseMoved = true;
         let dist = Math.sqrt(Math.pow(this.mouseLock.x - this.mouse.x, 2)
                              + Math.pow(this.mouseLock.y - this.mouse.y, 2));
-        let angle = Math.atan2(this.mouseLock.x - this.mouse.x,
-                               this.mouseLock.y - this.mouse.y);
+        let angle = Math.atan2(this.mouse.x - this.mouseLock.x,
+                               this.mouse.y - this.mouseLock.y);
 
         for(let i=0; i < dist; i += this.weight / 8) {
-            let x = this.mouseLock.x + Math.sin(angle) * i;
-            let y = this.mouseLock.y + Math.cos(angle) * i;
+            let x = this.mouseLock.x + (Math.sin(angle) * i);
+            let y = this.mouseLock.y + (Math.cos(angle) * i);
 
             var radgrad = this.context.createRadialGradient(x, y, this.weight/4,
                                                             x, y, this.weight/2);
@@ -370,7 +374,8 @@ export default class Paint {
 
             switch(this.currentTool) {
             case "pencil":
-                this.canvas.addEventListener("mousemove", this.drawPencil);
+                this.toolFunction = this.drawPencil.bind(this);
+                this.canvas.addEventListener("mousemove", this.toolFunction);
                 if(this.fill) {
                     this.context.save();
                     this.context.lineWidth = 1;
@@ -378,24 +383,29 @@ export default class Paint {
                 break;
             case "brush":
                 this.context.save();
-                this.canvas.addEventListener("mousemove", this.drawBrush);
+                this.toolFunction = this.drawBrush.bind(this);
+                this.canvas.addEventListener("mousemove", this.toolFunction);
                 break;
             case "circle":
-                this.canvas.addEventListener("mousemove", this.drawCircle);
+                this.toolFunction = this.drawCircle.bind(this);
+                this.canvas.addEventListener("mousemove", this.toolFunction);
                 break;
             case "square":
                 this.context.save();
                 this.context.lineJoin = "miter";
-                this.canvas.addEventListener("mousemove", this.drawRectangle);
+                this.toolFunction = this.drawRectangle.bind(this);
+                this.canvas.addEventListener("mousemove", this.toolFunction);
                 break;
             case "line":
-                this.canvas.addEventListener("mousemove", this.drawLine);
+                this.toolFunction = this.drawLine.bind(this);
+                this.canvas.addEventListener("mousemove", this.toolFunction);
                 break;
             case "text":
                 this.context.save();
                 this.context.lineWidth = 1;
                 this.context.strokeStyle = "#222";
-                this.canvas.addEventListener("mousemove", this.drawText);
+                this.toolFunction = this.drawText.bind(this);
+                this.canvas.addEventListener("mousemove", this.toolFunction);
                 break;
             case "eraser":
                 this.currentLayer.context.save();
@@ -403,7 +413,8 @@ export default class Paint {
                 this.currentLayer.context.lineCap = "round";
                 this.currentLayer.context.globalCompositeOperation = "destination-out";
                 this.currentLayer.context.beginPath();
-                this.canvas.addEventListener("mousemove", this.erase);
+                this.toolFunction = this.erase.bind(this);
+                this.canvas.addEventListener("mousemove", this.toolFunction);
                 break;
             case "dropper":
                 // needed for completeness
@@ -412,7 +423,8 @@ export default class Paint {
                 // needed for completeness
                 break;
             case "image":
-                this.canvas.addEventListener("mousemvoe", this.drawImage);
+                this.toolFunction = this.drawImage.bind(this);
+                this.canvas.addEventListener("mousemove", this.toolFunction);
                 break;
             default:
                 alert(`Invalid tool selection: ${this.currentTool}`);
@@ -423,7 +435,7 @@ export default class Paint {
         this.canvas.addEventListener("mouseup", () => {
             switch(this.currentTool) {
             case "pencil":
-                this.canvas.removeEventListener("mousemove", this.drawPencil);
+                this.canvas.removeEventListener("mousemove", this.toolFunction);
                 if(this.fill) {
                     let ctx = this.currentLayer.context;
                     ctx.beginPath();
@@ -449,7 +461,7 @@ export default class Paint {
                 this.points = [];
                 break;
             case "brush":
-                this.canvas.removeEventListener("mousemove", this.drawBrush);
+                this.canvas.removeEventListener("mousemove", this.toolFunction);
                 this.context.restore();
                 this.currentLayer.context.drawImage(this.canvas, 0, 0);
 
@@ -462,7 +474,7 @@ export default class Paint {
                 this.points = [];
                 break;
             case "circle":
-                this.canvas.removeEventListener("mousemove", this.drawCircle);
+                this.canvas.removeEventListener("mousemove", this.toolFunction);
                 this.currentLayer.context.drawImage(this.canvas, 0, 0);
                 if(this.mouseMoved) {
                     let color = this.fill ? this.colors[0] : this.colors[1];
@@ -473,7 +485,7 @@ export default class Paint {
                 }
                 break;
             case "square":
-                this.canvas.removeEventListener("mousemove", this.drawRectangle);
+                this.canvas.removeEventListener("mousemove", this.toolFunction);
                 this.context.restore();
                 this.currentLayer.context.drawImage(this.canvas, 0, 0);
                 if(this.mouseMoved) {
@@ -485,7 +497,7 @@ export default class Paint {
                 }
                 break;
             case "line":
-                this.canvas.removeEventListener("mousemove", this.drawLine);
+                this.canvas.removeEventListener("mousemove", this.toolFunction);
                 this.currentLayer.context.drawImage(this.canvas, 0, 0);
                 if(this.mouseMoved) {
                     this.currentLayer.history.pushAction("line", this.colors[1], false,
@@ -495,7 +507,7 @@ export default class Paint {
                 }
                 break;
             case "text":
-                this.canvas.removeEventListener("mousemove", this.drawText);
+                this.canvas.removeEventListener("mousemove", this.toolFunction);
 
                 textbox.style.left = `${this.mouseLock.x}px`;
                 textbox.style.top = `${this.mouseLock.y}px`;
@@ -523,7 +535,7 @@ export default class Paint {
                 this.context.restore();
                 break;
             case "eraser":
-                this.canvas.removeEventListener("mousemove", this.erase);
+                this.canvas.removeEventListener("mousemove", this.toolFunction);
                 this.currentLayer.context.restore();
 
                 if(this.mouseMoved) {
@@ -554,7 +566,7 @@ export default class Paint {
                 colorChooser.click();
                 break;
             case "image":
-                this.canvas.removeEventListener("mousemove", this.drawImage);
+                this.canvas.removeEventListener("mousemove", this.toolFunction);
                 this.currentLayer.context.drawImage(this.canvas, 0, 0);
 
                 if(this.mouseMoved) {

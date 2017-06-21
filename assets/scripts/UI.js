@@ -7,7 +7,10 @@ define(["require", "exports", "Paint", "knockout"], function (require, exports, 
             var drawspace = document.getElementById("drawspace");
             this.paint = new Paint_1.Paint(drawspace);
             this.paint.init();
+            this.paint.tool = "pencil";
+            this.paint.weight = 10;
             this.fileChooser = document.createElement("input");
+            this.fileChooser.type = "file";
             this.fileChooser.addEventListener("change", function (e) {
                 var file = e.target.files[0];
                 var reader = new FileReader();
@@ -30,10 +33,12 @@ define(["require", "exports", "Paint", "knockout"], function (require, exports, 
             });
             this.selectedTool("pencil");
             this.primaryColor = ko.observable("#000000");
+            this.primaryColor.subscribe(function (color) {
+                _this.paint.setColors(color, color);
+            });
             this.paint.setColorChangeCallback(function (primary, secondary) {
                 _this.primaryColor(_this.paint.primaryColor);
             });
-            this.primaryColor("#000000");
             this.brushWeight = ko.observable(10);
             this.brushWeight.subscribe(function (weight) {
                 if (weight < 1) {
@@ -100,6 +105,17 @@ define(["require", "exports", "Paint", "knockout"], function (require, exports, 
             this.historyLayers(this.paint.workingLayer.history.fullHistory());
             this.selectedHistoryUnit({ index: this.paint.workingLayer.history.states.length - 1,
                 version: this.paint.workingLayer.history.version });
+        };
+        PaintViewModel.prototype.deleteLayer = function () {
+            if (this.paint.layerList.length > 1) {
+                var index = this.selectedLayerIndex();
+                this.selectedLayerIndex(index > 0 ? index - 1 : index);
+                this.layerList(this.paint.deleteLayer(this.layerList()[index].id));
+                this.paint.switchLayer(this.layerList()[index > 0 ? index - 1 : index].id);
+                this.historyLayers(this.paint.workingLayer.history.fullHistory());
+                this.selectedHistoryUnit({ index: this.paint.workingLayer.history.states.length - 1,
+                    version: this.paint.workingLayer.history.version });
+            }
         };
         PaintViewModel.prototype.updateHistory = function () {
             this.historyLayers([]);
