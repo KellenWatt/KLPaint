@@ -2,7 +2,7 @@ import {Point, Tool} from "./definitions";
 import Layer from "./PaintLayer";
 
 
-class Paint {
+export default class Paint {
     workspace: HTMLElement;
     canvas: HTMLCanvasElement;
     context: CanvasRenderingContext2D;
@@ -32,6 +32,8 @@ class Paint {
         this._fill = false;
 
         this.workspace = workspace;
+        this.mouse = new Point(0, 0);
+        this.mouseLock = new Point(0, 0);
     }
 
     get weight() : number {
@@ -123,6 +125,7 @@ class Paint {
         this.currentLayer.context.fillStyle = this.context.fillStyle;
         this.currentLayer.context.strokeStyle = this.context.strokeStyle;
         this.currentLayer.context.lineWidth = this._weight;
+
     }
 
     get layerList() : Layer[] {
@@ -207,6 +210,20 @@ class Paint {
         }
 
         return img.toDataURL();
+    }
+
+    nuke() : Layer[] {
+        for(let layer of this.layers) {
+            layer.finalize();
+        }
+        this.layers = [];
+        this.layerCounter = 0;
+        this.currentLayer = this.addLayer()[0];
+        return this.layers;
+    }
+
+    clearCurrentLayer() : void {
+        this.currentLayer.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
     // drawing functions
@@ -557,3 +574,5 @@ class Paint {
     }
 
 }
+
+export {Paint};

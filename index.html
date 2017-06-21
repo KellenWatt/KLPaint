@@ -8,11 +8,12 @@
     <link rel="stylesheet" type="text/css" href="assets/styles/reset.css">
     <link rel="stylesheet" type="text/css" href="assets/styles/styles.css">
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script type="text/javascript" src="assets/scripts/knockout-3.4.2.js"></script>
     <script type="text/javascript" src="assets/scripts/Layer.js"></script>
     <script type="text/javascript" src="assets/scripts/Paint.js"></script>
-    <script type="text/javascript" src="assets/scripts/UI.js" defer></script>
+    <script type="text/javascript" src="assets/scripts/UI.js" defer></script> -->
+    <script data-main="assets/scripts/require-config.js" src="assets/scripts/lib/require.js" defer></script>
 
     </head>
 <body>
@@ -97,17 +98,17 @@
         <div class="layers" id="layers" data-bind="visible: layersVisible">
             <ul class="layer-list" id="layer-list" >
                 <!-- ko foreach:layerList -->
-                <li class="layer-list-item" data-bind="click: selectLayer.bind($data, $index()), css: {'layer-list-item-selected': selectedLayerIndex() === $index()}">
+                <li class="layer-list-item" data-bind="click: $root.selectLayer.bind($data, $index()), css: {'layer-list-item-selected': $root.selectedLayerIndex() === $index()}">
                     <img src="assets/images/visible.png" alt="visible" />
-                    <span data-bind="text: name, css:{'bold-text': selectedLayerIndex() === $index()}" ></span>
+                    <span data-bind="text: name, css:{'bold-text': $root.selectedLayerIndex() === $index()}" ></span>
                 </li>
                 <!-- /ko -->
                 <!-- TODO: Move these outside the list; -->
                 <li class="layer-list-item layer-controls">
-                    <div class="layer-action" id="create-layer" data-bind="click: newLayer">
+                    <div class="layer-action" id="create-layer" data-bind="click: $root.newLayer">
                         <img src="assets/images/add.png" alt="add layer">
                     </div>
-                    <div class="layer-action" id="delete-layer" data-bind="click: deleteLayer">
+                    <div class="layer-action" id="delete-layer" data-bind="click: $root.deleteLayer">
                         <img src="assets/images/trash.png" alt="add layer">
                     </div>
                 </li>
@@ -117,19 +118,19 @@
             <ul class="history-tree" data-bind="foreach: historyLayers">
                 <li class="history-level">
                     <div class="history-node" data-bind="text: $data.versions[0].tool,
-                      click: selectHistoryUnit.bind($data, $index(), 0),
-                      css: {'bold-text': selectedHistoryUnit().index == $index() &&
-                            selectedHistoryUnit().version == 0,
-                            'history-node-selected': selectedHistoryUnit().index == $index() &&
-                            selectedHistoryUnit().version == 0}">
+                      click: $root.selectHistoryUnit.bind($data, $index(), 0),
+                      css: {'bold-text': $root.selectedHistoryUnit().index == $index() &&
+                            $root.selectedHistoryUnit().version == 0,
+                            'history-node-selected': $root.selectedHistoryUnit().index == $index() &&
+                            $root.selectedHistoryUnit().version == 0}">
                     </div>
                     <!-- ko if: $data.versions.length === 2 -->
                     <div class="history-node" data-bind="text: $data.versions[1].tool,
-                      click: selectHistoryUnit.bind($data, $index(), 1),
-                      css: {'bold-text': selectedHistoryUnit().index == $index() &&
-                            selectedHistoryUnit().version == 1,
-                            'history-node-selected': selectedHistoryUnit().index == $index() &&
-                            selectedHistoryUnit().version == 1}">
+                      click: $root.selectHistoryUnit.bind($data, $index(), 1),
+                      css: {'bold-text': $root.selectedHistoryUnit().index == $index() &&
+                            $root.selectedHistoryUnit().version == 1,
+                            'history-node-selected': $root.selectedHistoryUnit().index == $index() &&
+                            $root.selectedHistoryUnit().version == 1}">
                     </div>
                     <!-- /ko -->
                 </li>

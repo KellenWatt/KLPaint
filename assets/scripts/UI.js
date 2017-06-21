@@ -1,211 +1,128 @@
-(function(document, ko, $) {
-    // Paint declaration pre-reqs
-    var drawspace = document.getElementById("drawspace");
-    var color = document.getElementById("primary-color");
-    var iweight = +(document.getElementById("brush-size").value)
-
-    var paint = new Paint(drawspace, color.value, color.value, iweight);
-    paint.init();
-    // paint.setCurrentTool("brush");
-
-    // color.addEventListener("change", function() {
-    //     paint.setColors(this.value, this.value);
-    // });
-
-    // document.getElementById("fill").addEventListener("change", function() {
-    //     paint.setFill(this.checked);
-    // });
-
-    var fileChooser = document.createElement("input");
-    fileChooser.type = "file";
-    fileChooser.addEventListener("change", function(e) {
-        var file = e.target.files[0];
-        var reader = new FileReader();
-
-        reader.addEventListener("load", function(f) {
-            return function(e) {
-                var img = new Image();
-                img.src = e.target.result;
-                paint.setImage(img);
-            };
-        }(file));
-
-        reader.readAsDataURL(file);
-
-    }, false);
-
-    // Knockout bindings
-
-    function PaintViewModel() {
-        var self = this;
-
-        self.paletteVisible = ko.observable(true);
-        self.togglePalette = function() {
-            self.paletteVisible(!self.paletteVisible());
+define(["require", "exports", "Paint", "knockout"], function (require, exports, Paint_1, ko) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var PaintViewModel = (function () {
+        function PaintViewModel() {
+            var _this = this;
+            var drawspace = document.getElementById("drawspace");
+            this.paint = new Paint_1.Paint(drawspace);
+            this.paint.init();
+            this.fileChooser = document.createElement("input");
+            this.fileChooser.addEventListener("change", function (e) {
+                var file = e.target.files[0];
+                var reader = new FileReader();
+                reader.addEventListener("load", function (e) {
+                    var img = new Image();
+                    img.src = e.target.result;
+                    _this.paint.imageToolImage = img;
+                });
+                reader.readAsDataURL(file);
+            }, false);
+            this.paletteVisible = ko.observable(true);
+            this.layersVisible = ko.observable(true);
+            this.historyVisible = ko.observable(true);
+            this.sidebarVisible = ko.computed(function () {
+                return _this.layersVisible() || _this.historyVisible();
+            });
+            this.selectedTool = ko.observable("pencil");
+            this.selectedTool.subscribe(function (newval) {
+                _this.paint.tool = newval;
+            });
+            this.selectedTool("pencil");
+            this.primaryColor = ko.observable("#000000");
+            this.paint.setColorChangeCallback(function (primary, secondary) {
+                _this.primaryColor(_this.paint.primaryColor);
+            });
+            this.primaryColor("#000000");
+            this.brushWeight = ko.observable(10);
+            this.brushWeight.subscribe(function (weight) {
+                if (weight < 1) {
+                    _this.brushWeight(1);
+                    _this.paint.weight = 1;
+                }
+                _this.paint.weight = weight;
+            });
+            this.brushWeight(10);
+            this.fillValue = ko.observable(false);
+            this.fillValue.subscribe(function (f) {
+                _this.paint.fill = f;
+            });
+            this.fillValue(false);
+            this.historyLayers = ko.observableArray(this.paint.workingLayer.history.fullHistory());
+            this.layerList = ko.observableArray(this.paint.layerList);
+            this.selectedLayerIndex = ko.observable(0);
+            this.selectedHistoryUnit = ko.observable({ index: 0, version: 0 });
+        }
+        PaintViewModel.prototype.togglePalette = function () {
+            this.paletteVisible(!this.paletteVisible());
         };
-
-        self.layersVisible = ko.observable(true);
-        self.toggleLayers = function() {
-            self.layersVisible(!self.layersVisible());
+        PaintViewModel.prototype.toggleLayers = function () {
+            this.layersVisible(!this.layersVisible());
         };
-
-        self.historyVisible = ko.observable(true);
-        self.toggleHistory = function() {
-            self.historyVisible(!self.historyVisible());
+        PaintViewModel.prototype.toggleHistory = function () {
+            this.historyVisible(!this.historyVisible());
         };
-
-        self.sidebarVisible = ko.computed(function() {
-            return self.layersVisible() || self.historyVisible();
-        });
-
-        self.nukeProject = function() {
-            // paint.clearCurrentLayer();
-            self.layerList(paint.nuke());
-            self.selectedLayerIndex(0);
-            self.historyLayers(paint.getCurrentLayer().history.fullHistory());
-            self.selectedHistoryUnit({index: 0, version: 0});
+        PaintViewModel.prototype.nukeProject = function () {
+            this.layerList(this.paint.nuke());
+            this.selectedLayerIndex(0);
+            this.historyLayers(this.paint.workingLayer.history.fullHistory());
+            this.selectedHistoryUnit({ index: 0, version: 0 });
         };
-
-        self.download = function() {
+        PaintViewModel.prototype.download = function () {
             var link = document.createElement("a");
-            link.href = paint.render();
+            link.href = this.paint.collapse();
             link.download = "MyDrawing.png";
             link.click();
         };
-
-        self.upload = function() {
-
+        PaintViewModel.prototype.upload = function () { };
+        PaintViewModel.prototype.toolbarUndo = function () {
+            this.paint.undo();
+            var i = this.selectedHistoryUnit().index;
+            this.selectedHistoryUnit({ index: (i <= 0 ? 0 : i - 1), version: 0 });
         };
-
-        self.toolbarUndo = function() {
-            // undo previous thing on current layer
-            paint.undo()
-            var i = self.selectedHistoryUnit().index;
-            self.selectedHistoryUnit({index: (i <= 0 ? 0 : i-1),
-                                      version: 0});
+        PaintViewModel.prototype.toolbarRedo = function () {
+            this.paint.redo();
+            var i = this.selectedHistoryUnit().index;
+            var l = this.paint.workingLayer.history.states.length;
+            this.selectedHistoryUnit({ index: (i == l - 1 ? l - 1 : i + 1), version: 0 });
         };
-
-        self.toolbarRedo = function() {
-            // redo thing on current layer
-            paint.redo();
-            var i = self.selectedHistoryUnit().index;
-            var l = paint.getCurrentLayer().history.states.length;
-            self.selectedHistoryUnit({index: (i == l-1 ? l-1 : i+1),
-                                      version: 0})
-        }
-
-        this.selectedTool = ko.observable();
-        this.selectedTool.subscribe(function(newval) {
-            paint.setCurrentTool(newval);
-        });
-        this.selectedTool("pencil");
-
-        this.findImage = function() {
-            self.selectedTool("image");
-            fileChooser.click();
+        PaintViewModel.prototype.findImage = function () {
+            this.selectedTool("image");
+            this.fileChooser.click();
         };
-
-        this.primaryColor = ko.observable();
-        this.primaryColor.subscribe(function(color) {
-            paint.setColors(color, color);
-        });
-
-        this.secondaryColor = ko.observable();
-        this.secondaryColor.subscribe(function(color) {
-            paint.setSecondaryColor(color);
-        });
-
-        this.primaryColor(paint.getColors()[0]);
-        paint.setColorChangeCallback(function() {
-            self.primaryColor(paint.getColors()[0]);
-        });
-
-        this.brushWeight = ko.observable();
-        this.brushWeight.subscribe(function(wt) {
-            if(wt < 1) {
-                self.brushWeight(1);
-            }
-            paint.setWeight(wt);
-        });
-        this.brushWeight(10);
-
-        this.fillValue = ko.observable();
-        this.fillValue.subscribe(function(f) {
-            paint.setFill(f);
-        });
-        this.fillValue(false);
-
-        this.historyLayers = ko.observableArray(paint.getCurrentLayer().history.fullHistory());
-        this.layerList = ko.observableArray(paint.getLayers());
-
-        this.newLayer = function() {
-            self.layerList(paint.addLayer());
-            self.historyLayers(paint.getCurrentLayer().history.fullHistory());
+        PaintViewModel.prototype.newLayer = function () {
+            this.layerList(this.paint.addLayer());
+            this.historyLayers(this.paint.workingLayer.history.fullHistory());
         };
-
-        this.selectedLayerIndex = ko.observable(0);
-        this.selectLayer = function(index) {
-            paint.setLayer(self.layerList()[index].id)
-            self.selectedLayerIndex(index);
-            self.historyLayers(paint.getCurrentLayer().history.fullHistory());
-            self.selectedHistoryUnit({index: paint.getCurrentLayer().history.states.length-1,
-                                    version: paint.getCurrentLayer().history.version});
+        PaintViewModel.prototype.selectLayer = function (index) {
+            this.paint.switchLayer(this.layerList()[index].id);
+            this.selectedLayerIndex(index);
+            this.historyLayers(this.paint.workingLayer.history.fullHistory());
+            this.selectedHistoryUnit({ index: this.paint.workingLayer.history.states.length - 1,
+                version: this.paint.workingLayer.history.version });
         };
-
-        this.deleteLayer = function() {
-            if(paint.getLayers().length > 1) {
-                var index = self.selectedLayerIndex();
-                self.selectedLayerIndex(index > 0 ? index-1 : index);
-                self.layerList(paint.deleteLayer(self.layerList()[index].id));
-                paint.setLayer(self.layerList()[index > 0 ? index-1 : index].id);
-                self.historyLayers(paint.getCurrentLayer().history.fullHistory());
-                self.selectedHistoryUnit({index: paint.getCurrentLayer().history.states.length-1,
-                                        version: paint.getCurrentLayer().history.version});
+        PaintViewModel.prototype.updateHistory = function () {
+            this.historyLayers([]);
+            this.historyLayers(this.paint.workingLayer.history.fullHistory());
+            if (this.paint.changed) {
+                this.selectedHistoryUnit({ index: this.selectedHistoryUnit().index + 1,
+                    version: 0 });
             }
         };
-
-        this.updateHistory = function() {
-            self.historyLayers([]);
-            self.historyLayers(paint.getCurrentLayer().history.fullHistory());
-            var ver = 0;
-            if(paint.changed()){
-                self.selectedHistoryUnit({index: self.selectedHistoryUnit().index + 1,
-                                      version: ver});
+        PaintViewModel.prototype.selectHistoryUnit = function (index, version) {
+            if (index >= this.selectedHistoryUnit().index) {
+                this.paint.redo(index, version);
             }
-        };
-
-        this.selectedHistoryUnit = ko.observable({
-            index: 0,
-            version: 0
-        });
-
-        this.selectHistoryUnit = function(i, v) {
-            console.log(i, self.selectedHistoryUnit().index)
-            if(i >= self.selectedHistoryUnit().index) {
-                paint.redo(i,v);
-            } else {
-                paint.undo(i,v);
+            else {
+                this.paint.undo(index, version);
             }
-            self.selectedHistoryUnit({index: i, version: v});
-
+            this.selectedHistoryUnit({ index: index, version: version });
         };
-
-        this.isHistoryUnitSelected = function(i, v) {
-            return self.selectedHistoryUnit().index == i &&
-                   self.selectedHistoryUnit().version == v;
+        PaintViewModel.prototype.isHistoryUnitSelected = function (index, version) {
+            return this.selectedHistoryUnit().index == index &&
+                this.selectedHistoryUnit().version == version;
         };
-
-
-
-    }
-
-    ko.applyBindings(PaintViewModel());
-    // End Knockout bindings
-    // Other stuff to do with the canvas
-
-
-
-    // End of other stuff
-    // ...
-    // What? Are you expecting more?
-})(document, ko, jQuery);
+        return PaintViewModel;
+    }());
+    ko.applyBindings(new PaintViewModel());
+});

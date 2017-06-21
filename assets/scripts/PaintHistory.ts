@@ -1,6 +1,6 @@
 import {Point, Tool} from "./definitions"
 
-class HistoryNode {
+export class HistoryNode {
     constructor(public tool: Tool | null,
                 public color: string | null,
                 public fill: boolean | null,
@@ -13,7 +13,7 @@ class HistoryNode {
                 public points: Point[]) {}
 }
 
-class HistoryLayer {
+export class HistoryLayer {
     versions: HistoryNode[];
     private _selectedVersion: number;
 
@@ -58,9 +58,9 @@ export default class PaintHistory {
         this.states[0].addAction(new HistoryNode(null, null, null, null, null, null, null, null, image, null));
     }
 
-    pushAction(tool: Tool|null, color: string|null, fill: boolean|null,
-               weight: number|null, x: number|null, dx: number|null,
-               y: number|null, dy: number|null, image: string,
+    pushAction(tool: Tool, color: string, fill: boolean,
+               weight: number, x: number, dx: number,
+               y: number, dy: number, image: string,
                points: Point[]) : void {
         if(!this.inPrevState) {
             this.states.push(new HistoryLayer());

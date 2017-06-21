@@ -10,8 +10,6 @@ define(["require", "exports", "./definitions", "./PaintLayer"], function (requir
             this.currentTool = "pencil";
             this._fill = false;
             this.workspace = workspace;
-            this.mouse = new definitions_1.Point(0, 0);
-            this.mouseLock = new definitions_1.Point(0, 0);
         }
         Object.defineProperty(Paint.prototype, "weight", {
             get: function () {
@@ -197,19 +195,6 @@ define(["require", "exports", "./definitions", "./PaintLayer"], function (requir
                 ctx.drawImage(this.layers[i].canvas, 0, 0);
             }
             return img.toDataURL();
-        };
-        Paint.prototype.nuke = function () {
-            for (var _i = 0, _a = this.layers; _i < _a.length; _i++) {
-                var layer = _a[_i];
-                layer.finalize();
-            }
-            this.layers = [];
-            this.layerCounter = 0;
-            this.currentLayer = this.addLayer()[0];
-            return this.layers;
-        };
-        Paint.prototype.clearCurrentLayer = function () {
-            this.currentLayer.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
         };
         // drawing functions
         Paint.prototype.drawPencil = function () {
@@ -491,6 +476,4 @@ define(["require", "exports", "./definitions", "./PaintLayer"], function (requir
         };
         return Paint;
     }());
-    exports.Paint = Paint;
-    exports.default = Paint;
 });
