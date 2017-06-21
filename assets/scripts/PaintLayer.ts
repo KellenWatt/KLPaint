@@ -1,4 +1,4 @@
-import PaintHistory from "./PaintHistory.js";
+import PaintHistory from "./PaintHistory";
 
 export default class Layer {
     private _id: number;
@@ -43,6 +43,10 @@ export default class Layer {
 
     get context() : CanvasRenderingContext2D {
         return this._context;
+    }
+
+    get history() : PaintHistory {
+        return this._history;
     }
 
     finalize() : void {

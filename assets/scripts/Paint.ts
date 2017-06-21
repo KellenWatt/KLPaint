@@ -1,5 +1,5 @@
-import {Point, Tool} from "./definitions.js";
-import Layer from "./PaintLayer.js";
+import {Point, Tool} from "./definitions";
+import Layer from "./PaintLayer";
 
 
 class Paint {
@@ -341,8 +341,8 @@ class Paint {
             this.setColors(color, color);
         });
 
-        let textBox = document.createElement("textarea");
-        textBox.style.position = "absolute";
+        let textbox = document.createElement("textarea");
+        textbox.style.position = "absolute";
 
         this.canvas.addEventListener("mousedown", () => {
             this.context.beginPath();
@@ -456,27 +456,102 @@ class Paint {
                 }
                 break;
             case "square":
-
+                this.canvas.removeEventListener("mousemove", this.drawRectangle);
+                this.context.restore();
+                this.currentLayer.context.drawImage(this.canvas, 0, 0);
+                if(this.mouseMoved) {
+                    let color = this.fill ? this.colors[0] : this.colors[1];
+                    this.currentLayer.history.pushAction("square", color, this.fill,
+                        this.weight, this.mouseLock.x, this.mouseLock.y,
+                        this.mouse.x - this.mouseLock.x, this.mouse.y - this.mouseLock.y,
+                        this.currentLayer.canvas.toDataURL(), []);
+                }
                 break;
             case "line":
-
+                this.canvas.removeEventListener("mousemove", this.drawLine);
+                this.currentLayer.context.drawImage(this.canvas, 0, 0);
+                if(this.mouseMoved) {
+                    this.currentLayer.history.pushAction("line", this.colors[1], false,
+                        this.weight, this.mouseLock.x, this.mouseLock.y,
+                        this.mouse.x - this.mouseLock.x, this.mouse.y - this.mouseLock.y,
+                        this.currentLayer.canvas.toDataURL(), []);
+                }
                 break;
             case "text":
+                this.canvas.removeEventListener("mousemove", this.drawText);
 
+                textbox.style.left = `${this.mouseLock.x}px`;
+                textbox.style.top = `${this.mouseLock.y}px`;
+                textbox.style.width = `${this.mouse.x - this.mouseLock.x}px`;
+                textbox.style.height = `${this.mouse.y - this.mouseLock.y}px`;
+
+                this.workspace.appendChild(textbox);
+                textbox.focus();
+                textbox.addEventListener("blur", () => {
+                    this.currentLayer.context.fillText(textbox.value,
+                        this.mouseLock.x, this.mouseLock.y,
+                        this.mouse.x - this.mouseLock.x,);
+                    textbox.value = "";
+                    textbox.remove();
+
+                    if(this.mouseMoved) {
+                        this.currentLayer.history.pushAction("text", this.colors[0], false,
+                            this.weight, this.mouseLock.x, this.mouseLock.y,
+                            this.mouse.x - this.mouseLock.x, this.mouse.y - this.mouseLock.y,
+                            this.currentLayer.canvas.toDataURL(), []);
+                    }
+                });
+
+                this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                this.context.restore();
                 break;
             case "eraser":
+                this.canvas.removeEventListener("mousemove", this.erase);
+                this.currentLayer.context.restore();
 
+                if(this.mouseMoved) {
+                    this.currentLayer.history.pushAction("eraser", this.colors[0], this.fill,
+                        this.weight, this.mouseLock.x, this.mouseLock.y,
+                        this.mouse.x - this.mouseLock.x, this.mouse.y - this.mouseLock.y,
+                        this.currentLayer.canvas.toDataURL(), this.points);
+                }
+                this.points = [];
                 break;
             case "dropper":
+                let pix  = this.currentLayer.context
+                               .getImageData(this.mouse.x, this.mouse.y, 1, 1).data;
 
+                let red = pix[0].toString(16);
+                let green = pix[1].toString(16);
+                let blue = pix[2].toString(16);
+
+                if(red.length == 1) red = `0${red}`;
+                if(green.length == 1) green = `0${green}`;
+                if(blue.length == 1) blue = `0${blue}`;
+
+                let colorString = `#${red}${green}${blue}`;
+
+                this.setColors(colorString, colorString);
                 break;
             case "color":
-
+                colorChooser.click();
                 break;
             case "image":
+                this.canvas.removeEventListener("mousemove", this.drawImage);
+                this.currentLayer.context.drawImage(this.canvas, 0, 0);
 
+                if(this.mouseMoved) {
+                    this.currentLayer.history.pushAction("image", "#000000", false,
+                        this.weight, this.mouseLock.x, this.mouseLock.y,
+                        this.mouse.x - this.mouseLock.x, this.mouse.y - this.mouseLock.y,
+                        this.currentLayer.canvas.toDataURL(), []);
+                }
+                break;
+            default:
+                alert(`Invalid tool selection: ${this.currentTool}`);
                 break;
             }
+            this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
         });
 
     }

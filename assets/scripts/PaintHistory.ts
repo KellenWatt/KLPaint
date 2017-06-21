@@ -1,4 +1,4 @@
-import {Point, Tool} from "./definitions.js"
+import {Point, Tool} from "./definitions"
 
 class HistoryNode {
     constructor(public tool: Tool | null,
