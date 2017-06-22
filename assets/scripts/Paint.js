@@ -11,6 +11,7 @@ define(["require", "exports", "./definitions", "./PaintLayer", "tools/pencil", "
     var dropper = new dropper_1.default();
     var colorPicker = new color_picker_1.default();
     var imager = new image_1.default();
+    // TODO: build in map of toolTypes, toss in init
     var Paint = (function () {
         function Paint(workspace) {
             this.layers = [];

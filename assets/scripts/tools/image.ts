@@ -2,7 +2,7 @@ import {Paint} from "Paint";
 import {ITool, ToolName} from "../types/tools";
 import {Point} from "../definitions";
 
-export default class Images implements ITool {
+export default class Imager implements ITool {
     paint: Paint;
     drawOnMove: () => void;
     readonly name: ToolName;

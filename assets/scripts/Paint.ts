@@ -23,6 +23,9 @@ let dropper = new Dropper();
 let colorPicker = new Color();
 let imager = new Imager();
 
+// TODO: build in map of toolTypes, toss in init
+
+
 export default class Paint {
     workspace: HTMLElement;
     canvas: HTMLCanvasElement;
