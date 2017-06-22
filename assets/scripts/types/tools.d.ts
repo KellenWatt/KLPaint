@@ -7,9 +7,12 @@ interface IPoint {
 
 interface ITool {
     paint: Paint;
+    readonly name: string;
     prep: (controller: Paint) => void;
     draw: () => void;
     finish: () => void;
 }
 
-export {IPoint, ITool};
+type ToolName = string;
+
+export {IPoint, ITool, ToolName};

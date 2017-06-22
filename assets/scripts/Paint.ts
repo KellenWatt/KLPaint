@@ -2,10 +2,26 @@ import {Point} from "./definitions";
 import Layer from "./PaintLayer";
 import Pencil from "tools/pencil";
 import Brush from "tools/brush";
+import Circle from "tools/circle";
+import Square from "tools/square";
+import Line from "tools/line";
+import Text from "tools/text";
+import Eraser from "tools/eraser";
+import Dropper from "tools/dropper";
+import Color from "tools/color-picker";
+import Imager from "tools/image";
 
 
 let pencil = new Pencil();
 let brush = new Brush();
+let circle = new Circle();
+let square = new Square();
+let line = new Line();
+let text = new Text();
+let eraser = new Eraser();
+let dropper = new Dropper();
+let colorPicker = new Color();
+let imager = new Imager();
 
 export default class Paint {
     workspace: HTMLElement;
@@ -382,50 +398,34 @@ export default class Paint {
                 pencil.prep(this);
                 break;
             case "brush":
-                // this.context.save();
-                // this.toolFunction = this.drawBrush.bind(this);
-                // this.canvas.addEventListener("mousemove", this.toolFunction);
                 brush.prep(this);
                 break;
             case "circle":
-                this.toolFunction = this.drawCircle.bind(this);
-                this.canvas.addEventListener("mousemove", this.toolFunction);
+                circle.prep(this);
                 break;
             case "square":
-                this.context.save();
-                this.context.lineJoin = "miter";
-                this.toolFunction = this.drawRectangle.bind(this);
-                this.canvas.addEventListener("mousemove", this.toolFunction);
+                square.prep(this);
                 break;
             case "line":
-                this.toolFunction = this.drawLine.bind(this);
-                this.canvas.addEventListener("mousemove", this.toolFunction);
+                line.prep(this);
                 break;
             case "text":
-                this.context.save();
-                this.context.lineWidth = 1;
-                this.context.strokeStyle = "#222";
-                this.toolFunction = this.drawText.bind(this);
-                this.canvas.addEventListener("mousemove", this.toolFunction);
+                text.prep(this);
                 break;
             case "eraser":
-                this.currentLayer.context.save();
-                this.currentLayer.context.lineJoin = "round";
-                this.currentLayer.context.lineCap = "round";
-                this.currentLayer.context.globalCompositeOperation = "destination-out";
-                this.currentLayer.context.beginPath();
-                this.toolFunction = this.erase.bind(this);
-                this.canvas.addEventListener("mousemove", this.toolFunction);
+                eraser.prep(this);
                 break;
             case "dropper":
-                // needed for completeness
+                dropper.prep(this);
                 break;
             case "color":
                 // needed for completeness
+                colorPicker.prep(this);
                 break;
             case "image":
-                this.toolFunction = this.drawImage.bind(this);
-                this.canvas.addEventListener("mousemove", this.toolFunction);
+                // this.toolFunction = this.drawImage.bind(this);
+                // this.canvas.addEventListener("mousemove", this.toolFunction);
+                imager.prep(this);
                 break;
             default:
                 alert(`Invalid tool selection: ${this.currentTool}`);
@@ -439,121 +439,31 @@ export default class Paint {
                 pencil.finish();
                 break;
             case "brush":
-                // this.canvas.removeEventListener("mousemove", this.toolFunction);
-                // this.context.restore();
-                // this.currentLayer.context.drawImage(this.canvas, 0, 0);
-                //
-                // if(this.mouseMoved) {
-                //     this.currentLayer.history.pushAction("brush", this.colors[0],
-                //         false, this.weight, this.mouseLock.x, this.mouseLock.y,
-                //         this.mouse.x - this.mouseLock.x, this.mouse.y - this.mouseLock.y,
-                //         this.currentLayer.canvas.toDataURL(), this.points);
-                // }
-                // this.points = [];
                 brush.finish();
                 break;
             case "circle":
-                this.canvas.removeEventListener("mousemove", this.toolFunction);
-                this.currentLayer.context.drawImage(this.canvas, 0, 0);
-                if(this.mouseMoved) {
-                    let color = this.fill ? this.colors[0] : this.colors[1];
-                    this.currentLayer.history.pushAction("circle", color, this.fill,
-                        this.weight, this.mouseLock.x, this.mouseLock.y,
-                        this.mouse.x - this.mouseLock.x, this.mouse.y - this.mouseLock.y,
-                        this.currentLayer.canvas.toDataURL(), []);
-                }
+                circle.finish();
                 break;
             case "square":
-                this.canvas.removeEventListener("mousemove", this.toolFunction);
-                this.context.restore();
-                this.currentLayer.context.drawImage(this.canvas, 0, 0);
-                if(this.mouseMoved) {
-                    let color = this.fill ? this.colors[0] : this.colors[1];
-                    this.currentLayer.history.pushAction("square", color, this.fill,
-                        this.weight, this.mouseLock.x, this.mouseLock.y,
-                        this.mouse.x - this.mouseLock.x, this.mouse.y - this.mouseLock.y,
-                        this.currentLayer.canvas.toDataURL(), []);
-                }
+                square.finish();
                 break;
             case "line":
-                this.canvas.removeEventListener("mousemove", this.toolFunction);
-                this.currentLayer.context.drawImage(this.canvas, 0, 0);
-                if(this.mouseMoved) {
-                    this.currentLayer.history.pushAction("line", this.colors[1], false,
-                        this.weight, this.mouseLock.x, this.mouseLock.y,
-                        this.mouse.x - this.mouseLock.x, this.mouse.y - this.mouseLock.y,
-                        this.currentLayer.canvas.toDataURL(), []);
-                }
+                line.finish();
                 break;
             case "text":
-                this.canvas.removeEventListener("mousemove", this.toolFunction);
-
-                textbox.style.left = `${this.mouseLock.x}px`;
-                textbox.style.top = `${this.mouseLock.y}px`;
-                textbox.style.width = `${this.mouse.x - this.mouseLock.x}px`;
-                textbox.style.height = `${this.mouse.y - this.mouseLock.y}px`;
-
-                this.workspace.appendChild(textbox);
-                textbox.focus();
-                textbox.addEventListener("blur", () => {
-                    this.currentLayer.context.fillText(textbox.value,
-                        this.mouseLock.x, this.mouseLock.y,
-                        this.mouse.x - this.mouseLock.x,);
-                    textbox.value = "";
-                    textbox.remove();
-
-                    if(this.mouseMoved) {
-                        this.currentLayer.history.pushAction("text", this.colors[0], false,
-                            this.weight, this.mouseLock.x, this.mouseLock.y,
-                            this.mouse.x - this.mouseLock.x, this.mouse.y - this.mouseLock.y,
-                            this.currentLayer.canvas.toDataURL(), []);
-                    }
-                });
-
-                this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-                this.context.restore();
+                text.finish();
                 break;
             case "eraser":
-                this.canvas.removeEventListener("mousemove", this.toolFunction);
-                this.currentLayer.context.restore();
-
-                if(this.mouseMoved) {
-                    this.currentLayer.history.pushAction("eraser", this.colors[0], this.fill,
-                        this.weight, this.mouseLock.x, this.mouseLock.y,
-                        this.mouse.x - this.mouseLock.x, this.mouse.y - this.mouseLock.y,
-                        this.currentLayer.canvas.toDataURL(), this.points);
-                }
-                this.points = [];
+                eraser.finish();
                 break;
             case "dropper":
-                let pix  = this.currentLayer.context
-                               .getImageData(this.mouse.x, this.mouse.y, 1, 1).data;
-
-                let red = pix[0].toString(16);
-                let green = pix[1].toString(16);
-                let blue = pix[2].toString(16);
-
-                if(red.length == 1) red = `0${red}`;
-                if(green.length == 1) green = `0${green}`;
-                if(blue.length == 1) blue = `0${blue}`;
-
-                let colorString = `#${red}${green}${blue}`;
-
-                this.setColors(colorString, colorString);
+                dropper.finish();
                 break;
             case "color":
-                colorChooser.click();
+                colorPicker.finish();
                 break;
             case "image":
-                this.canvas.removeEventListener("mousemove", this.toolFunction);
-                this.currentLayer.context.drawImage(this.canvas, 0, 0);
-
-                if(this.mouseMoved) {
-                    this.currentLayer.history.pushAction("image", "#000000", false,
-                        this.weight, this.mouseLock.x, this.mouseLock.y,
-                        this.mouse.x - this.mouseLock.x, this.mouse.y - this.mouseLock.y,
-                        this.currentLayer.canvas.toDataURL(), []);
-                }
+                imager.finish();
                 break;
             default:
                 alert(`Invalid tool selection: ${this.currentTool}`);

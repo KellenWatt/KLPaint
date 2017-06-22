@@ -19,7 +19,6 @@ define(["require", "exports", "../definitions"], function (require, exports, def
             this.paint.context.lineTo(this.paint.mouse.x, this.paint.mouse.y);
             this.paint.context.stroke();
             this.paint.points.push(new definitions_1.Point(this.paint.mouse.x, this.paint.mouse.y));
-            console.log("drawing pencil");
         };
         Pencil.prototype.finish = function () {
             this.paint.canvas.removeEventListener("mousemove", this.drawOnMove);

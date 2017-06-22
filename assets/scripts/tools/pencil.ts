@@ -27,7 +27,6 @@ export default class Pencil implements ITool {
         this.paint.context.lineTo(this.paint.mouse.x, this.paint.mouse.y);
         this.paint.context.stroke();
         this.paint.points.push(new Point(this.paint.mouse.x, this.paint.mouse.y));
-        console.log("drawing pencil");
     }
 
     finish() : void {
