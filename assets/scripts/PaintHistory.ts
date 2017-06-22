@@ -1,7 +1,8 @@
 import {Point, Tool} from "./definitions"
+import {ITool, ToolName} from "types/tools";
 
 export class HistoryNode {
-    constructor(public tool: Tool | null,
+    constructor(public tool: ToolName | null,
                 public color: string | null,
                 public fill: boolean | null,
                 public weight: number | null,
@@ -58,7 +59,7 @@ export default class PaintHistory {
         this.states[0].addAction(new HistoryNode(null, null, null, null, null, null, null, null, image, null));
     }
 
-    pushAction(tool: Tool, color: string, fill: boolean,
+    pushAction(tool: ToolName, color: string, fill: boolean,
                weight: number, x: number, dx: number,
                y: number, dy: number, image: string,
                points: Point[]) : void {

@@ -100,7 +100,7 @@
                 <!-- ko foreach:layerList -->
                 <li class="layer-list-item" data-bind="click: $root.selectLayer.bind($root, $index()), css: {'layer-list-item-selected': $root.selectedLayerIndex() === $index()}">
                     <img src="assets/images/visible.png" alt="visible" />
-                    <span data-bind="text: name, css:{'bold-text': $root.selectedLayerIndex() === $index()}" ></span>
+                    <span data-bind="text: name ? name : 'Empty', css:{'bold-text': $root.selectedLayerIndex() === $index()}" ></span>
                 </li>
                 <!-- /ko -->
                 <!-- TODO: Move these outside the list; -->

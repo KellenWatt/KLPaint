@@ -1,5 +1,4 @@
 import {Paint} from "Paint";
-import {Tool} from "definitions";
 import {HistoryLayer} from "PaintHistory";
 import {Layer} from "PaintLayer";
 import * as ko from "knockout";
@@ -19,7 +18,7 @@ class PaintViewModel {
     historyVisible: KnockoutObservable<boolean>;
     sidebarVisible: KnockoutComputed<boolean>;
 
-    selectedTool: KnockoutObservable<Tool>;
+    selectedTool: KnockoutObservable<string>;
     primaryColor: KnockoutObservable<string>;
     brushWeight: KnockoutObservable<number>;
     fillValue: KnockoutObservable<boolean>;
@@ -60,7 +59,7 @@ class PaintViewModel {
             return this.layersVisible() || this.historyVisible();
         });
 
-        this.selectedTool = ko.observable("pencil" as Tool);
+        this.selectedTool = ko.observable("pencil");
         this.selectedTool.subscribe((newval) => {
             this.paint.tool = newval;
         });
@@ -170,9 +169,9 @@ class PaintViewModel {
     }
 
     updateHistory() : void {
-        this.historyLayers([]);
-        this.historyLayers(this.paint.workingLayer.history.fullHistory());
         if(this.paint.changed) {
+            this.historyLayers([]);
+            this.historyLayers(this.paint.workingLayer.history.fullHistory());
             this.selectedHistoryUnit({index: this.selectedHistoryUnit().index + 1,
                                     version: 0});
         }

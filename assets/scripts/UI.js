@@ -118,9 +118,9 @@ define(["require", "exports", "Paint", "knockout"], function (require, exports, 
             }
         };
         PaintViewModel.prototype.updateHistory = function () {
-            this.historyLayers([]);
-            this.historyLayers(this.paint.workingLayer.history.fullHistory());
             if (this.paint.changed) {
+                this.historyLayers([]);
+                this.historyLayers(this.paint.workingLayer.history.fullHistory());
                 this.selectedHistoryUnit({ index: this.selectedHistoryUnit().index + 1,
                     version: 0 });
             }

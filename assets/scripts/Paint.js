@@ -1,6 +1,8 @@
-define(["require", "exports", "./definitions", "./PaintLayer"], function (require, exports, definitions_1, PaintLayer_1) {
+define(["require", "exports", "./definitions", "./PaintLayer", "tools/pencil", "tools/brush"], function (require, exports, definitions_1, PaintLayer_1, pencil_1, brush_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    var pencil = new pencil_1.default();
+    var brush = new brush_1.default();
     var Paint = (function () {
         function Paint(workspace) {
             this.layers = [];
@@ -324,17 +326,13 @@ define(["require", "exports", "./definitions", "./PaintLayer"], function (requir
                 _this.mouseMoved = false;
                 switch (_this.currentTool) {
                     case "pencil":
-                        _this.toolFunction = _this.drawPencil.bind(_this);
-                        _this.canvas.addEventListener("mousemove", _this.toolFunction);
-                        if (_this.fill) {
-                            _this.context.save();
-                            _this.context.lineWidth = 1;
-                        }
+                        pencil.prep(_this);
                         break;
                     case "brush":
-                        _this.context.save();
-                        _this.toolFunction = _this.drawBrush.bind(_this);
-                        _this.canvas.addEventListener("mousemove", _this.toolFunction);
+                        // this.context.save();
+                        // this.toolFunction = this.drawBrush.bind(this);
+                        // this.canvas.addEventListener("mousemove", this.toolFunction);
+                        brush.prep(_this);
                         break;
                     case "circle":
                         _this.toolFunction = _this.drawCircle.bind(_this);
@@ -384,36 +382,21 @@ define(["require", "exports", "./definitions", "./PaintLayer"], function (requir
             this.canvas.addEventListener("mouseup", function () {
                 switch (_this.currentTool) {
                     case "pencil":
-                        _this.canvas.removeEventListener("mousemove", _this.toolFunction);
-                        if (_this.fill) {
-                            var ctx = _this.currentLayer.context;
-                            ctx.beginPath();
-                            ctx.moveTo(_this.points[0].x, _this.points[0].y);
-                            for (var _i = 0, _a = _this.points; _i < _a.length; _i++) {
-                                var p = _a[_i];
-                                ctx.lineTo(p.x, p.y);
-                            }
-                            ctx.fill();
-                            ctx.closePath();
-                            ctx.restore();
-                        }
-                        else {
-                            _this.currentLayer.context.drawImage(_this.canvas, 0, 0);
-                        }
-                        if (_this.mouseMoved) {
-                            var color = _this.fill ? _this.colors[0] : _this.colors[1];
-                            _this.currentLayer.history.pushAction("pencil", color, _this.fill, _this.weight, _this.mouseLock.x, _this.mouseLock.y, _this.mouse.x - _this.mouseLock.x, _this.mouse.y - _this.mouseLock.y, _this.currentLayer.canvas.toDataURL(), _this.points);
-                        }
-                        _this.points = [];
+                        pencil.finish();
                         break;
                     case "brush":
-                        _this.canvas.removeEventListener("mousemove", _this.toolFunction);
-                        _this.context.restore();
-                        _this.currentLayer.context.drawImage(_this.canvas, 0, 0);
-                        if (_this.mouseMoved) {
-                            _this.currentLayer.history.pushAction("brush", _this.colors[0], false, _this.weight, _this.mouseLock.x, _this.mouseLock.y, _this.mouse.x - _this.mouseLock.x, _this.mouse.y - _this.mouseLock.y, _this.currentLayer.canvas.toDataURL(), _this.points);
-                        }
-                        _this.points = [];
+                        // this.canvas.removeEventListener("mousemove", this.toolFunction);
+                        // this.context.restore();
+                        // this.currentLayer.context.drawImage(this.canvas, 0, 0);
+                        //
+                        // if(this.mouseMoved) {
+                        //     this.currentLayer.history.pushAction("brush", this.colors[0],
+                        //         false, this.weight, this.mouseLock.x, this.mouseLock.y,
+                        //         this.mouse.x - this.mouseLock.x, this.mouse.y - this.mouseLock.y,
+                        //         this.currentLayer.canvas.toDataURL(), this.points);
+                        // }
+                        // this.points = [];
+                        brush.finish();
                         break;
                     case "circle":
                         _this.canvas.removeEventListener("mousemove", _this.toolFunction);
