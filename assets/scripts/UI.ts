@@ -2,6 +2,7 @@ import {Paint} from "Paint";
 import {HistoryLayer} from "PaintHistory";
 import {Layer} from "PaintLayer";
 import * as ko from "knockout";
+import {Point} from "definitions";
 
 
 interface HistoryUnit {
@@ -189,6 +190,13 @@ class PaintViewModel {
     isHistoryUnitSelected(index: number, version: number) {
         return this.selectedHistoryUnit().index == index &&
                this.selectedHistoryUnit().version == version;
+    }
+
+    zoomImage(data: PaintViewModel, e: WheelEvent) : void {
+        let center = new Point(e.offsetX, e.offsetY);
+        let dy = e.deltaY;
+        console.log(dy);
+        this.paint.zoom(center, 1.1 * (dy > 0 ? 1 : -1));
     }
 
 }

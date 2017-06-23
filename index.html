@@ -93,7 +93,7 @@
             </div>
         </div>
     </div>
-    <section id="drawspace" data-bind="event: {mouseup: updateHistory}"></section>
+    <section id="drawspace" data-bind="event: {mouseup: updateHistory, wheel: zoomImage}"></section>
     <div class="sidebar frame" data-bind="visible: sidebarVisible">
         <div class="layers" id="layers" data-bind="visible: layersVisible">
             <ul class="layer-list" id="layer-list" >

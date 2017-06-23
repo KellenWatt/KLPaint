@@ -1,17 +1,6 @@
 define(["require", "exports", "./definitions", "./PaintLayer", "tools/pencil", "tools/brush", "tools/circle", "tools/square", "tools/line", "tools/text", "tools/eraser", "tools/dropper", "tools/color-picker", "tools/image"], function (require, exports, definitions_1, PaintLayer_1, pencil_1, brush_1, circle_1, square_1, line_1, text_1, eraser_1, dropper_1, color_picker_1, image_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var pencil = new pencil_1.default();
-    var brush = new brush_1.default();
-    var circle = new circle_1.default();
-    var square = new square_1.default();
-    var line = new line_1.default();
-    var text = new text_1.default();
-    var eraser = new eraser_1.default();
-    var dropper = new dropper_1.default();
-    var colorPicker = new color_picker_1.default();
-    var imager = new image_1.default();
-    // TODO: build in map of toolTypes, toss in init
     var Paint = (function () {
         function Paint(workspace) {
             this.layers = [];
@@ -244,6 +233,9 @@ define(["require", "exports", "./definitions", "./PaintLayer", "tools/pencil", "
         };
         Paint.prototype.clearCurrentLayer = function () {
             this.currentLayer.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        };
+        Paint.prototype.zoom = function (center, level) {
+            console.log(definitions_1.Point, "zoom level: " + level);
         };
         Paint.prototype.init = function () {
             var _this = this;

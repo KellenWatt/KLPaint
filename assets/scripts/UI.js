@@ -1,4 +1,4 @@
-define(["require", "exports", "Paint", "knockout"], function (require, exports, Paint_1, ko) {
+define(["require", "exports", "Paint", "knockout", "definitions"], function (require, exports, Paint_1, ko, definitions_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var PaintViewModel = (function () {
@@ -137,6 +137,12 @@ define(["require", "exports", "Paint", "knockout"], function (require, exports, 
         PaintViewModel.prototype.isHistoryUnitSelected = function (index, version) {
             return this.selectedHistoryUnit().index == index &&
                 this.selectedHistoryUnit().version == version;
+        };
+        PaintViewModel.prototype.zoomImage = function (data, e) {
+            var center = new definitions_1.Point(e.offsetX, e.offsetY);
+            var dy = e.deltaY;
+            console.log(dy);
+            this.paint.zoom(center, 1.1 * (dy > 0 ? 1 : -1));
         };
         return PaintViewModel;
     }());

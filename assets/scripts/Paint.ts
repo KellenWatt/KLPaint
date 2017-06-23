@@ -13,20 +13,6 @@ import Imager from "tools/image";
 import {ITool, ToolName} from "types/tools";
 
 
-let pencil = new Pencil();
-let brush = new Brush();
-let circle = new Circle();
-let square = new Square();
-let line = new Line();
-let text = new Text();
-let eraser = new Eraser();
-let dropper = new Dropper();
-let colorPicker = new Color();
-let imager = new Imager();
-
-// TODO: build in map of toolTypes, toss in init
-
-
 export default class Paint {
     workspace: HTMLElement;
     canvas: HTMLCanvasElement;
@@ -47,8 +33,6 @@ export default class Paint {
     mouseMoved: boolean;
 
     points: Point[];
-
-    toolFunction: () => void;
 
     tools: {};
 
@@ -278,6 +262,10 @@ export default class Paint {
 
     clearCurrentLayer() : void {
         this.currentLayer.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+
+    zoom(center: Point, level: number) : void {
+        console.log(Point, `zoom level: ${level}`);
     }
 
     init() : void {
