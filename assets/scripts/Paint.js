@@ -24,6 +24,28 @@ define(["require", "exports", "./definitions", "./PaintLayer", "tools/pencil", "
             this.mouse = new definitions_1.Point(0, 0);
             this.mouseLock = new definitions_1.Point(0, 0);
             this.points = [];
+            this.tools = {};
+            this.tools["Empty"] = null;
+            var pencil = new pencil_1.default();
+            this.tools[pencil.name] = pencil;
+            var brush = new brush_1.default();
+            this.tools[brush.name] = brush;
+            var circle = new circle_1.default();
+            this.tools[circle.name] = circle;
+            var square = new square_1.default();
+            this.tools[square.name] = square;
+            var line = new line_1.default();
+            this.tools[line.name] = line;
+            var text = new text_1.default();
+            this.tools[text.name] = text;
+            var eraser = new eraser_1.default();
+            this.tools[eraser.name] = eraser;
+            var dropper = new dropper_1.default();
+            this.tools[dropper.name] = dropper;
+            var colorPicker = new color_picker_1.default();
+            this.tools[colorPicker.name] = colorPicker;
+            var imager = new image_1.default();
+            this.tools[imager.name] = imager;
         }
         Object.defineProperty(Paint.prototype, "weight", {
             get: function () {
@@ -223,85 +245,6 @@ define(["require", "exports", "./definitions", "./PaintLayer", "tools/pencil", "
         Paint.prototype.clearCurrentLayer = function () {
             this.currentLayer.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
         };
-        // drawing functions
-        Paint.prototype.drawPencil = function () {
-            this.mouseMoved = true;
-            this.context.lineTo(this.mouse.x, this.mouse.y);
-            this.context.stroke();
-            this.points.push(new definitions_1.Point(this.mouse.x, this.mouse.y));
-        };
-        Paint.prototype.drawBrush = function () {
-            this.mouseMoved = true;
-            var dist = Math.sqrt(Math.pow(this.mouseLock.x - this.mouse.x, 2)
-                + Math.pow(this.mouseLock.y - this.mouse.y, 2));
-            var angle = Math.atan2(this.mouse.x - this.mouseLock.x, this.mouse.y - this.mouseLock.y);
-            for (var i = 0; i < dist; i += this.weight / 8) {
-                var x = this.mouseLock.x + (Math.sin(angle) * i);
-                var y = this.mouseLock.y + (Math.cos(angle) * i);
-                var radgrad = this.context.createRadialGradient(x, y, this.weight / 4, x, y, this.weight / 2);
-                radgrad.addColorStop(0, this.addAlpha(this.colors[0], 1));
-                radgrad.addColorStop(0.5, this.addAlpha(this.colors[0], 0.5));
-                radgrad.addColorStop(1, this.addAlpha(this.colors[0], 0));
-                this.context.fillStyle = radgrad;
-                this.context.fillRect(x - this.weight / 2, y - this.weight / 2, this.weight, this.weight);
-                this.points.push(new definitions_1.Point(x, y));
-            }
-            this.mouseLock.x = this.mouse.x;
-            this.mouseLock.y = this.mouse.y;
-        };
-        Paint.prototype.drawCircle = function () {
-            this.mouseMoved = true;
-            var radius = Math.sqrt(Math.pow(this.mouse.x - this.mouseLock.x, 2)
-                + Math.pow(this.mouse.y - this.mouseLock.y, 2));
-            this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-            this.context.beginPath();
-            this.context.arc(this.mouseLock.x, this.mouseLock.y, radius, 0, 2 * Math.PI);
-            if (this.fill) {
-                this.context.fill();
-            }
-            else {
-                this.context.stroke();
-            }
-        };
-        Paint.prototype.drawRectangle = function () {
-            this.mouseMoved = true;
-            this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-            this.context.beginPath();
-            this.context.rect(this.mouseLock.x, this.mouseLock.y, this.mouse.x - this.mouseLock.x, this.mouse.y - this.mouseLock.y);
-            if (this.fill) {
-                this.context.fill();
-            }
-            else {
-                this.context.stroke();
-            }
-        };
-        Paint.prototype.drawLine = function () {
-            this.mouseMoved = true;
-            this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-            this.context.beginPath();
-            this.context.moveTo(this.mouseLock.x, this.mouseLock.y);
-            this.context.lineTo(this.mouse.x, this.mouse.y);
-            this.context.stroke();
-        };
-        Paint.prototype.drawText = function () {
-            this.mouseMoved = true;
-            this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-            this.context.beginPath();
-            this.context.rect(this.mouseLock.x, this.mouseLock.y, this.mouse.x - this.mouseLock.x, this.mouse.y - this.mouseLock.y);
-            this.context.stroke();
-        };
-        Paint.prototype.erase = function () {
-            this.mouseMoved = true;
-            var ctx = this.currentLayer.context;
-            ctx.lineTo(this.mouse.x, this.mouse.y);
-            ctx.stroke();
-            this.points.push(new definitions_1.Point(this.mouse.x, this.mouse.y));
-        };
-        Paint.prototype.drawImage = function () {
-            this.mouseMoved = true;
-            this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-            this.context.drawImage(this.image, this.mouseLock.x, this.mouseLock.y, this.mouse.x - this.mouseLock.x, this.mouse.y - this.mouseLock.y);
-        };
         Paint.prototype.init = function () {
             var _this = this;
             this.canvas = document.createElement("canvas");
@@ -333,81 +276,10 @@ define(["require", "exports", "./definitions", "./PaintLayer", "tools/pencil", "
                 _this.mouseLock.x = _this.mouse.x;
                 _this.mouseLock.y = _this.mouse.y;
                 _this.mouseMoved = false;
-                switch (_this.currentTool) {
-                    case "pencil":
-                        pencil.prep(_this);
-                        break;
-                    case "brush":
-                        brush.prep(_this);
-                        break;
-                    case "circle":
-                        circle.prep(_this);
-                        break;
-                    case "square":
-                        square.prep(_this);
-                        break;
-                    case "line":
-                        line.prep(_this);
-                        break;
-                    case "text":
-                        text.prep(_this);
-                        break;
-                    case "eraser":
-                        eraser.prep(_this);
-                        break;
-                    case "dropper":
-                        dropper.prep(_this);
-                        break;
-                    case "color":
-                        // needed for completeness
-                        colorPicker.prep(_this);
-                        break;
-                    case "image":
-                        // this.toolFunction = this.drawImage.bind(this);
-                        // this.canvas.addEventListener("mousemove", this.toolFunction);
-                        imager.prep(_this);
-                        break;
-                    default:
-                        alert("Invalid tool selection: " + _this.currentTool);
-                        break;
-                }
+                _this.tools[_this.currentTool].prep(_this);
             });
             this.canvas.addEventListener("mouseup", function () {
-                switch (_this.currentTool) {
-                    case "pencil":
-                        pencil.finish();
-                        break;
-                    case "brush":
-                        brush.finish();
-                        break;
-                    case "circle":
-                        circle.finish();
-                        break;
-                    case "square":
-                        square.finish();
-                        break;
-                    case "line":
-                        line.finish();
-                        break;
-                    case "text":
-                        text.finish();
-                        break;
-                    case "eraser":
-                        eraser.finish();
-                        break;
-                    case "dropper":
-                        dropper.finish();
-                        break;
-                    case "color":
-                        colorPicker.finish();
-                        break;
-                    case "image":
-                        imager.finish();
-                        break;
-                    default:
-                        alert("Invalid tool selection: " + _this.currentTool);
-                        break;
-                }
+                _this.tools[_this.currentTool].finish();
                 _this.context.clearRect(0, 0, _this.canvas.width, _this.canvas.height);
             });
         };

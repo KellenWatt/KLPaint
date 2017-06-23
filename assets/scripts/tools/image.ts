@@ -8,7 +8,7 @@ export default class Imager implements ITool {
     readonly name: ToolName;
 
     constructor() {
-        this.name = "pencil";
+        this.name = "image";
         this.drawOnMove = this.draw.bind(this);
     }
 

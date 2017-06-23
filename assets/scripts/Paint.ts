@@ -10,6 +10,7 @@ import Eraser from "tools/eraser";
 import Dropper from "tools/dropper";
 import Color from "tools/color-picker";
 import Imager from "tools/image";
+import {ITool, ToolName} from "types/tools";
 
 
 let pencil = new Pencil();
@@ -49,6 +50,8 @@ export default class Paint {
 
     toolFunction: () => void;
 
+    tools: {};
+
     constructor(workspace: HTMLElement) {
         this.layers = [];
         this.layerCounter = 0;
@@ -62,6 +65,29 @@ export default class Paint {
         this.mouseLock = new Point(0, 0);
 
         this.points = [];
+
+        this.tools = {};
+        this.tools["Empty"] = null;
+        let pencil = new Pencil();
+        this.tools[pencil.name] = pencil;
+        let brush = new Brush();
+        this.tools[brush.name] = brush;
+        let circle = new Circle();
+        this.tools[circle.name] = circle;
+        let square = new Square();
+        this.tools[square.name] = square;
+        let line = new Line();
+        this.tools[line.name] = line;
+        let text = new Text();
+        this.tools[text.name] = text;
+        let eraser = new Eraser();
+        this.tools[eraser.name] = eraser;
+        let dropper = new Dropper();
+        this.tools[dropper.name] = dropper;
+        let colorPicker = new Color();
+        this.tools[colorPicker.name] = colorPicker;
+        let imager = new Imager();
+        this.tools[imager.name] = imager;
     }
 
     get weight() : number {
@@ -254,110 +280,6 @@ export default class Paint {
         this.currentLayer.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
-    // drawing functions
-
-    private drawPencil() : void {
-        this.mouseMoved = true;
-        this.context.lineTo(this.mouse.x, this.mouse.y);
-        this.context.stroke();
-        this.points.push(new Point(this.mouse.x, this.mouse.y));
-    }
-
-    private drawBrush() : void {
-        this.mouseMoved = true;
-        let dist = Math.sqrt(Math.pow(this.mouseLock.x - this.mouse.x, 2)
-                             + Math.pow(this.mouseLock.y - this.mouse.y, 2));
-        let angle = Math.atan2(this.mouse.x - this.mouseLock.x,
-                               this.mouse.y - this.mouseLock.y);
-
-        for(let i=0; i < dist; i += this.weight / 8) {
-            let x = this.mouseLock.x + (Math.sin(angle) * i);
-            let y = this.mouseLock.y + (Math.cos(angle) * i);
-
-            var radgrad = this.context.createRadialGradient(x, y, this.weight/4,
-                                                            x, y, this.weight/2);
-            radgrad.addColorStop(0, this.addAlpha(this.colors[0], 1));
-            radgrad.addColorStop(0.5, this.addAlpha(this.colors[0], 0.5));
-            radgrad.addColorStop(1, this.addAlpha(this.colors[0], 0));
-
-            this.context.fillStyle = radgrad;
-            this.context.fillRect(x - this.weight/2, y - this.weight/2,
-                                  this.weight, this.weight);
-            this.points.push(new Point(x, y));
-        }
-
-        this.mouseLock.x = this.mouse.x;
-        this.mouseLock.y = this.mouse.y;
-    }
-
-    private drawCircle() : void {
-        this.mouseMoved = true;
-        let radius = Math.sqrt(Math.pow(this.mouse.x - this.mouseLock.x, 2)
-                               + Math.pow(this.mouse.y - this.mouseLock.y, 2));
-
-        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.context.beginPath();
-        this.context.arc(this.mouseLock.x, this.mouseLock.y, radius, 0, 2*Math.PI);
-        if(this.fill) {
-            this.context.fill();
-        } else {
-            this.context.stroke();
-        }
-    }
-
-    private drawRectangle() : void {
-        this.mouseMoved = true;
-
-        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.context.beginPath();
-        this.context.rect(this.mouseLock.x, this.mouseLock.y,
-                          this.mouse.x - this.mouseLock.x,
-                          this.mouse.y - this.mouseLock.y)
-        if(this.fill) {
-            this.context.fill();
-        } else {
-            this.context.stroke();
-        }
-    }
-
-    private drawLine() : void {
-        this.mouseMoved = true;
-
-        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.context.beginPath();
-        this.context.moveTo(this.mouseLock.x, this.mouseLock.y);
-        this.context.lineTo(this.mouse.x, this.mouse.y);
-        this.context.stroke();
-    }
-
-    private drawText() : void {
-        this.mouseMoved = true;
-
-        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.context.beginPath();
-        this.context.rect(this.mouseLock.x, this.mouseLock.y,
-                          this.mouse.x - this.mouseLock.x,
-                          this.mouse.y - this.mouseLock.y);
-        this.context.stroke();
-    }
-
-    private erase() : void {
-        this.mouseMoved = true;
-        let ctx = this.currentLayer.context;
-        ctx.lineTo(this.mouse.x, this.mouse.y);
-        ctx.stroke();
-        this.points.push(new Point(this.mouse.x, this.mouse.y));
-    }
-
-    private drawImage() : void {
-        this.mouseMoved = true;
-        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.context.drawImage(this.image, this.mouseLock.x, this.mouseLock.y,
-                               this.mouse.x - this.mouseLock.x,
-                               this.mouse.y - this.mouseLock.y);
-    }
-
-
     init() : void {
         this.canvas = document.createElement("canvas");
         this.canvas.width = this.workspace.offsetWidth;
@@ -396,82 +318,11 @@ export default class Paint {
             this.mouseLock.y = this.mouse.y;
             this.mouseMoved = false;
 
-            switch(this.currentTool) {
-            case "pencil":
-                pencil.prep(this);
-                break;
-            case "brush":
-                brush.prep(this);
-                break;
-            case "circle":
-                circle.prep(this);
-                break;
-            case "square":
-                square.prep(this);
-                break;
-            case "line":
-                line.prep(this);
-                break;
-            case "text":
-                text.prep(this);
-                break;
-            case "eraser":
-                eraser.prep(this);
-                break;
-            case "dropper":
-                dropper.prep(this);
-                break;
-            case "color":
-                // needed for completeness
-                colorPicker.prep(this);
-                break;
-            case "image":
-                // this.toolFunction = this.drawImage.bind(this);
-                // this.canvas.addEventListener("mousemove", this.toolFunction);
-                imager.prep(this);
-                break;
-            default:
-                alert(`Invalid tool selection: ${this.currentTool}`);
-                break;
-            }
+            this.tools[this.currentTool].prep(this);
         });
 
         this.canvas.addEventListener("mouseup", () => {
-            switch(this.currentTool) {
-            case "pencil":
-                pencil.finish();
-                break;
-            case "brush":
-                brush.finish();
-                break;
-            case "circle":
-                circle.finish();
-                break;
-            case "square":
-                square.finish();
-                break;
-            case "line":
-                line.finish();
-                break;
-            case "text":
-                text.finish();
-                break;
-            case "eraser":
-                eraser.finish();
-                break;
-            case "dropper":
-                dropper.finish();
-                break;
-            case "color":
-                colorPicker.finish();
-                break;
-            case "image":
-                imager.finish();
-                break;
-            default:
-                alert(`Invalid tool selection: ${this.currentTool}`);
-                break;
-            }
+            this.tools[this.currentTool].finish();
             this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
         });
 

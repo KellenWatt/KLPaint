@@ -3,7 +3,7 @@ define(["require", "exports"], function (require, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
     var Imager = (function () {
         function Imager() {
-            this.name = "pencil";
+            this.name = "image";
             this.drawOnMove = this.draw.bind(this);
         }
         Imager.prototype.prep = function (paint) {
