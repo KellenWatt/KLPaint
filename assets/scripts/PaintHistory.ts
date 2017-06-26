@@ -1,4 +1,4 @@
-import {Point, Tool} from "./definitions"
+import {Point} from "./definitions"
 import {ITool, ToolName} from "types/tools";
 
 export class HistoryNode {
@@ -115,7 +115,7 @@ export default class PaintHistory {
         return this.states;
     }
 
-    getcurrentState() : HistoryLayer {
+    getCurrentState() : HistoryLayer {
         return this.states[this.currentLayer];
     }
 

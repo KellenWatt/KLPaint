@@ -99,7 +99,7 @@ define(["require", "exports"], function (require, exports) {
         PaintHistory.prototype.fullHistory = function () {
             return this.states;
         };
-        PaintHistory.prototype.getcurrentState = function () {
+        PaintHistory.prototype.getCurrentState = function () {
             return this.states[this.currentLayer];
         };
         PaintHistory.prototype.getImageData = function (version) {

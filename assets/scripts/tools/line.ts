@@ -1,9 +1,8 @@
 import {Paint} from "Paint";
-import {ITool, ToolName} from "../types/tools";
 import {Point} from "../definitions";
 
 export default class Line implements ITool {
-    paint: Paint;
+    paint: IPaint;
     drawOnMove: () => void;
     readonly name: ToolName;
 
@@ -12,7 +11,7 @@ export default class Line implements ITool {
         this.drawOnMove = this.draw.bind(this);
     }
 
-    prep(paint: Paint) {
+    prep(paint: IPaint) {
         this.paint = paint;
         this.paint.canvas.addEventListener("mousemove", this.drawOnMove);
     }

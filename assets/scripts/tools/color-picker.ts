@@ -1,9 +1,8 @@
 import {Paint} from "Paint";
-import {ITool, ToolName} from "../types/tools";
 import {Point} from "../definitions";
 
 export default class Color implements ITool {
-    paint: Paint;
+    paint: IPaint;
     drawOnMove: () => void;
     readonly name: ToolName;
 
@@ -21,7 +20,7 @@ export default class Color implements ITool {
         })
     }
 
-    prep(paint: Paint) : void { this.paint = paint;}
+    prep(paint: IPaint) : void { this.paint = paint;}
 
     draw() : void {}
 

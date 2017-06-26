@@ -49,6 +49,10 @@ export default class Layer {
         return this._history;
     }
 
+    zoom() : void {
+
+    }
+
     finalize() : void {
         this._id = -1;
         this._name = null;

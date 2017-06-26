@@ -1,9 +1,8 @@
 import {Paint} from "Paint";
-import {ITool, ToolName} from "../types/tools";
 import {Point} from "../definitions";
 
 export default class Text implements ITool {
-    paint: Paint;
+    paint: IPaint;
     drawOnMove: () => void;
     readonly name: ToolName;
 
@@ -17,7 +16,7 @@ export default class Text implements ITool {
         this.textbox.style.position = "absolute";
     }
 
-    prep(paint: Paint) : void {
+    prep(paint: IPaint) : void {
         this.paint = paint;
         this.paint.context.save();
         this.paint.context.lineWidth = 1;

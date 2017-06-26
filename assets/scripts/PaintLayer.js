@@ -53,6 +53,8 @@ define(["require", "exports", "./PaintHistory"], function (require, exports, Pai
             enumerable: true,
             configurable: true
         });
+        Layer.prototype.zoom = function () {
+        };
         Layer.prototype.finalize = function () {
             this._id = -1;
             this._name = null;

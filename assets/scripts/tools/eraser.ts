@@ -1,9 +1,8 @@
 import {Paint} from "Paint";
-import {ITool, ToolName} from "../types/tools";
 import {Point} from "../definitions";
 
 export default class Eraser implements ITool {
-    paint: Paint;
+    paint: IPaint;
     drawOnMove: () => void;
     readonly name: ToolName;
 
@@ -12,7 +11,7 @@ export default class Eraser implements ITool {
         this.drawOnMove = this.draw.bind(this);
     }
 
-    prep(paint: Paint) : void {
+    prep(paint: IPaint) : void {
         this.paint = paint;
         this.paint.currentLayer.context.save();
         this.paint.currentLayer.context.lineJoin = "round";

@@ -1,9 +1,8 @@
 import {Paint} from "Paint";
-import {ITool, ToolName} from "../types/tools";
 import {Point} from "../definitions";
 
 export default class Pencil implements ITool {
-    paint: Paint;
+    paint: IPaint;
 
     readonly name: ToolName;
     drawOnMove: () => void;
@@ -13,7 +12,7 @@ export default class Pencil implements ITool {
         this.drawOnMove = this.draw.bind(this);
     }
 
-    prep(paint: Paint) : void {
+    prep(paint: IPaint) : void {
         this.paint = paint;
         if(this.paint.fill) {
             this.paint.context.save();
