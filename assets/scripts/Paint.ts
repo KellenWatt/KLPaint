@@ -33,10 +33,12 @@ export default class Paint {
 
     points: Point[];
 
-    offset: Point;
-    scalingFactor: number;
+    // offset: Point;
+    // scalingFactor: number;
 
     tools: {};
+
+    readOnly: boolean;
 
     constructor(workspace: HTMLElement) {
         this.layers = [];
@@ -314,18 +316,22 @@ export default class Paint {
         textbox.style.position = "absolute";
 
         this.canvas.addEventListener("mousedown", () => {
-            this.context.beginPath();
-            this.context.moveTo(this.mouse.x, this.mouse.y);
-            this.mouseLock.x = this.mouse.x;
-            this.mouseLock.y = this.mouse.y;
-            this.mouseMoved = false;
+            if(!this.readOnly) {
+                this.context.beginPath();
+                this.context.moveTo(this.mouse.x, this.mouse.y);
+                this.mouseLock.x = this.mouse.x;
+                this.mouseLock.y = this.mouse.y;
+                this.mouseMoved = false;
 
-            this.tools[this.currentTool].prep(this);
+                this.tools[this.currentTool].prep(this);
+            }
         });
 
         this.canvas.addEventListener("mouseup", () => {
-            this.tools[this.currentTool].finish();
-            this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            if(!this.readOnly) {
+                this.tools[this.currentTool].finish();
+                this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            }
         });
 
     }

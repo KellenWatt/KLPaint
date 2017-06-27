@@ -274,16 +274,20 @@ define(["require", "exports", "./definitions", "./PaintLayer", "tools/pencil", "
             var textbox = document.createElement("textarea");
             textbox.style.position = "absolute";
             this.canvas.addEventListener("mousedown", function () {
-                _this.context.beginPath();
-                _this.context.moveTo(_this.mouse.x, _this.mouse.y);
-                _this.mouseLock.x = _this.mouse.x;
-                _this.mouseLock.y = _this.mouse.y;
-                _this.mouseMoved = false;
-                _this.tools[_this.currentTool].prep(_this);
+                if (!_this.readOnly) {
+                    _this.context.beginPath();
+                    _this.context.moveTo(_this.mouse.x, _this.mouse.y);
+                    _this.mouseLock.x = _this.mouse.x;
+                    _this.mouseLock.y = _this.mouse.y;
+                    _this.mouseMoved = false;
+                    _this.tools[_this.currentTool].prep(_this);
+                }
             });
             this.canvas.addEventListener("mouseup", function () {
-                _this.tools[_this.currentTool].finish();
-                _this.context.clearRect(0, 0, _this.canvas.width, _this.canvas.height);
+                if (!_this.readOnly) {
+                    _this.tools[_this.currentTool].finish();
+                    _this.context.clearRect(0, 0, _this.canvas.width, _this.canvas.height);
+                }
             });
         };
         return Paint;
