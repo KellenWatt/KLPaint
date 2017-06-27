@@ -36,6 +36,7 @@ define(["require", "exports", "./definitions", "./PaintLayer", "tools/pencil", "
             this.tools[colorPicker.name] = colorPicker;
             var imager = new image_1.default();
             this.tools[imager.name] = imager;
+            this.init();
         }
         Object.defineProperty(Paint.prototype, "weight", {
             get: function () {
@@ -211,6 +212,9 @@ define(["require", "exports", "./definitions", "./PaintLayer", "tools/pencil", "
         };
         Paint.prototype.reconstruct = function (json) {
             // server-side stuff
+        };
+        Paint.prototype.serialize = function () {
+            return "";
         };
         Paint.prototype.refresh = function () {
             // redraw the image of each canvas

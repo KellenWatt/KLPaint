@@ -77,6 +77,8 @@ export default class Paint {
         this.tools[colorPicker.name] = colorPicker;
         let imager = new Imager();
         this.tools[imager.name] = imager;
+
+        this.init();
     }
 
     get weight() : number {
@@ -243,6 +245,12 @@ export default class Paint {
         // server-side stuff
     }
 
+    serialize() : string {
+
+
+        return "";
+    }
+
     refresh() : void {
         // redraw the image of each canvas
     }
@@ -284,7 +292,7 @@ export default class Paint {
     //
     // }
 
-    init() : void {
+    private init() : void {
         this.canvas = document.createElement("canvas");
         this.canvas.width = this.workspace.offsetWidth;
         this.canvas.height = this.workspace.offsetHeight;

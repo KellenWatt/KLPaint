@@ -6,7 +6,6 @@ define(["require", "exports", "Paint", "knockout"], function (require, exports, 
             var _this = this;
             var drawspace = document.getElementById("drawspace");
             this.paint = new Paint_1.Paint(drawspace);
-            this.paint.init();
             this.paint.tool = "pencil";
             this.paint.weight = 10;
             this.fileChooser = document.createElement("input");

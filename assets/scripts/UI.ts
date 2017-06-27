@@ -34,7 +34,6 @@ class PaintViewModel {
     constructor() {
         let drawspace = document.getElementById("drawspace");
         this.paint = new Paint(drawspace);
-        this.paint.init();
         this.paint.tool = "pencil";
         this.paint.weight = 10;
 
