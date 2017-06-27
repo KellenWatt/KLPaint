@@ -192,13 +192,6 @@ class PaintViewModel {
                this.selectedHistoryUnit().version == version;
     }
 
-    zoomImage(data: PaintViewModel, e: WheelEvent) : void {
-        let center = new Point(e.offsetX, e.offsetY);
-        let dy = e.deltaY;
-        console.log(dy);
-        this.paint.zoom(center, 1.1 * (dy > 0 ? 1 : -1));
-    }
-
 }
 
 ko.applyBindings(new PaintViewModel());

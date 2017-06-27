@@ -10,6 +10,7 @@ define(["require", "exports", "./definitions", "./PaintLayer", "tools/pencil", "
             this.currentTool = "pencil";
             this._fill = false;
             this.workspace = workspace;
+            this.workspace.style.overflow = "none";
             this.mouse = new definitions_1.Point(0, 0);
             this.mouseLock = new definitions_1.Point(0, 0);
             this.points = [];
@@ -211,6 +212,9 @@ define(["require", "exports", "./definitions", "./PaintLayer", "tools/pencil", "
         Paint.prototype.reconstruct = function (json) {
             // server-side stuff
         };
+        Paint.prototype.refresh = function () {
+            // redraw the image of each canvas
+        };
         Paint.prototype.collapse = function () {
             var img = document.createElement("canvas");
             img.width = this.canvas.width;
@@ -234,9 +238,16 @@ define(["require", "exports", "./definitions", "./PaintLayer", "tools/pencil", "
         Paint.prototype.clearCurrentLayer = function () {
             this.currentLayer.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
         };
-        Paint.prototype.zoom = function (center, level) {
-            console.log(definitions_1.Point, "zoom level: " + level);
-        };
+        // mapRealToVirtual(p: Point) : Point {
+        //     let x = p.x / this.scalingFactor + this.offset.x;
+        //     let y = p.y / this.scalingFactor + this.offset.y;
+        //
+        //     return new Point(x, y);
+        // }
+        //
+        // zoom(center: Point, scale: boolean) : void {
+        //
+        // }
         Paint.prototype.init = function () {
             var _this = this;
             this.canvas = document.createElement("canvas");
@@ -251,8 +262,8 @@ define(["require", "exports", "./definitions", "./PaintLayer", "tools/pencil", "
             this.context.lineCap = "round";
             this.context.lineJoin = "round";
             this.canvas.addEventListener("mousemove", function (e) {
-                _this.mouse.x = e.pageX - _this.workspace.offsetLeft;
-                _this.mouse.y = e.pageY - _this.workspace.offsetTop;
+                _this.mouse.x = e.offsetX;
+                _this.mouse.y = e.offsetY;
             });
             var colorChooser = document.createElement("input");
             colorChooser.type = "color";

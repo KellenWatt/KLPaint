@@ -1,4 +1,3 @@
-import Paint from "Paint";
 import {Point} from  "../definitions";
 
 export default class Brush implements ITool {

@@ -10,7 +10,6 @@ import Eraser from "tools/eraser";
 import Dropper from "tools/dropper";
 import Color from "tools/color-picker";
 import Imager from "tools/image";
-import {ITool, ToolName} from "types/tools";
 
 
 export default class Paint {
@@ -34,6 +33,9 @@ export default class Paint {
 
     points: Point[];
 
+    offset: Point;
+    scalingFactor: number;
+
     tools: {};
 
     constructor(workspace: HTMLElement) {
@@ -45,6 +47,7 @@ export default class Paint {
         this._fill = false;
 
         this.workspace = workspace;
+        this.workspace.style.overflow = "none";
         this.mouse = new Point(0, 0);
         this.mouseLock = new Point(0, 0);
 
@@ -238,6 +241,10 @@ export default class Paint {
         // server-side stuff
     }
 
+    refresh() : void {
+        // redraw the image of each canvas
+    }
+
     collapse() : string{
         let img = document.createElement("canvas");
         img.width = this.canvas.width;
@@ -264,9 +271,16 @@ export default class Paint {
         this.currentLayer.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
-    zoom(center: Point, level: number) : void {
-        console.log(Point, `zoom level: ${level}`);
-    }
+    // mapRealToVirtual(p: Point) : Point {
+    //     let x = p.x / this.scalingFactor + this.offset.x;
+    //     let y = p.y / this.scalingFactor + this.offset.y;
+    //
+    //     return new Point(x, y);
+    // }
+    //
+    // zoom(center: Point, scale: boolean) : void {
+    //
+    // }
 
     init() : void {
         this.canvas = document.createElement("canvas");
@@ -285,8 +299,8 @@ export default class Paint {
         this.context.lineJoin = "round";
 
         this.canvas.addEventListener("mousemove", (e) => {
-            this.mouse.x = e.pageX - this.workspace.offsetLeft;
-            this.mouse.y = e.pageY - this.workspace.offsetTop;
+            this.mouse.x = (e as MouseEvent).offsetX;
+            this.mouse.y = (e as MouseEvent).offsetY;
         });
 
         let colorChooser = document.createElement("input");
