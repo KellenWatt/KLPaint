@@ -11,6 +11,7 @@ define(["require", "exports", "./definitions", "./PaintLayer", "tools/pencil", "
             this._fill = false;
             this.workspace = workspace;
             this.workspace.style.overflow = "none";
+            // this.workspace.style.position = "relative";
             this.mouse = new definitions_1.Point(0, 0);
             this.mouseLock = new definitions_1.Point(0, 0);
             this.points = [];
@@ -211,13 +212,29 @@ define(["require", "exports", "./definitions", "./PaintLayer", "tools/pencil", "
             img.src = this.currentLayer.history.getImageData(version);
         };
         Paint.prototype.reconstruct = function (json) {
-            // server-side stuff
+            var obj = JSON.parse(json);
+            for (var _i = 0, _a = this.layers; _i < _a.length; _i++) {
+                var layer = _a[_i];
+                layer.finalize();
+            }
+            this.layers = [];
+            for (var _b = 0, obj_1 = obj; _b < obj_1.length; _b++) {
+                var layer = obj_1[_b];
+                this.layers.push(PaintLayer_1.default.loadObject(layer, this.workspace));
+            }
+            this.currentLayer = this.layers[this.layers.length - 1];
+            this.render();
         };
         Paint.prototype.serialize = function () {
-            return "";
+            return JSON.stringify(this.layers);
         };
-        Paint.prototype.refresh = function () {
+        Paint.prototype.render = function () {
             // redraw the image of each canvas
+            for (var _i = 0, _a = this.layers; _i < _a.length; _i++) {
+                var layer = _a[_i];
+                this.undo();
+                this.redo();
+            }
         };
         Paint.prototype.collapse = function () {
             var img = document.createElement("canvas");

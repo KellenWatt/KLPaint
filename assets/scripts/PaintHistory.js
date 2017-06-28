@@ -20,14 +20,14 @@ define(["require", "exports"], function (require, exports) {
     var HistoryLayer = (function () {
         function HistoryLayer() {
             this.versions = [];
-            this._selectedVersion = 0;
+            this.selectedVersion = 0;
         }
         HistoryLayer.prototype.addAction = function (node) {
             this.versions.push(node);
             if (this.versions.length > 2) {
                 this.versions.shift();
             }
-            this._selectedVersion = this.versions.length - 1;
+            this.selectedVersion = this.versions.length - 1;
         };
         HistoryLayer.prototype.currentVersion = function (version) {
             return this.versions[version];
@@ -35,13 +35,6 @@ define(["require", "exports"], function (require, exports) {
         HistoryLayer.prototype.branchCount = function () {
             return this.versions.length;
         };
-        Object.defineProperty(HistoryLayer.prototype, "selectedVersion", {
-            get: function () {
-                return this._selectedVersion;
-            },
-            enumerable: true,
-            configurable: true
-        });
         return HistoryLayer;
     }());
     exports.HistoryLayer = HistoryLayer;
@@ -52,7 +45,7 @@ define(["require", "exports"], function (require, exports) {
             this.version = 0;
             this.inPrevState = false;
             this.states.push(new HistoryLayer());
-            this.states[0].addAction(new HistoryNode(null, null, null, null, null, null, null, null, image, null));
+            this.states[0].addAction(new HistoryNode(null, null, null, null, null, null, null, null, image, []));
         }
         PaintHistory.prototype.pushAction = function (tool, color, fill, weight, x, dx, y, dy, image, points) {
             if (!this.inPrevState) {
@@ -104,6 +97,21 @@ define(["require", "exports"], function (require, exports) {
         };
         PaintHistory.prototype.getImageData = function (version) {
             return this.states[this.currentLayer].currentVersion(version).imageData;
+        };
+        PaintHistory.loadObject = function (obj) {
+            var image = obj.states[0].versions[0].imageData;
+            var hist = new PaintHistory(image);
+            obj.states.shift();
+            for (var _i = 0, _a = obj.states; _i < _a.length; _i++) {
+                var layer = _a[_i];
+                var n = layer.versions[0];
+                hist.pushAction(n.tool, n.color, n.fill, n.weight, n.x, n.y, n.dx, n.dy, n.imageData, n.points);
+                if (layer.versions.length > 1) {
+                    var m = layer.versions[1];
+                    hist.states[hist.currentLayer].addAction(new HistoryNode(m.tool, m.color, m.fill, m.weight, m.x, m.y, m.dx, m.dy, m.imageData, m.points));
+                }
+            }
+            return hist;
         };
         return PaintHistory;
     }());

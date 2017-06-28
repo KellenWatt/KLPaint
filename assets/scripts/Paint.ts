@@ -50,6 +50,7 @@ export default class Paint {
 
         this.workspace = workspace;
         this.workspace.style.overflow = "none";
+        // this.workspace.style.position = "relative";
         this.mouse = new Point(0, 0);
         this.mouseLock = new Point(0, 0);
 
@@ -242,17 +243,32 @@ export default class Paint {
     }
 
     reconstruct(json: string) : void {
-        // server-side stuff
+        let obj = JSON.parse(json);
+
+        for(let layer of this.layers) {
+            layer.finalize();
+        }
+
+        this.layers = [];
+
+        for(let layer of obj) {
+            this.layers.push(Layer.loadObject(layer, this.workspace));
+        }
+
+        this.currentLayer = this.layers[this.layers.length -1];
+        this.render();
     }
 
     serialize() : string {
-
-
-        return "";
+        return JSON.stringify(this.layers);
     }
 
-    refresh() : void {
+    render() : void {
         // redraw the image of each canvas
+        for(let layer of this.layers) {
+            this.undo();
+            this.redo();
+        }
     }
 
     collapse() : string{

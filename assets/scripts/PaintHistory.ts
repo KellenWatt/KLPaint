@@ -1,5 +1,4 @@
 import {Point} from "./definitions"
-import {ITool, ToolName} from "types/tools";
 
 export class HistoryNode {
     constructor(public tool: ToolName | null,
@@ -16,11 +15,11 @@ export class HistoryNode {
 
 export class HistoryLayer {
     versions: HistoryNode[];
-    private _selectedVersion: number;
+    selectedVersion: number;
 
     constructor() {
         this.versions = [];
-        this._selectedVersion = 0;
+        this.selectedVersion = 0;
     }
 
     addAction(node: HistoryNode) : void {
@@ -28,7 +27,7 @@ export class HistoryLayer {
         if(this.versions.length > 2) {
             this.versions.shift();
         }
-        this._selectedVersion = this.versions.length - 1;
+        this.selectedVersion = this.versions.length - 1;
     }
 
     currentVersion(version: number) : HistoryNode {
@@ -37,10 +36,6 @@ export class HistoryLayer {
 
     branchCount() : number {
         return this.versions.length;
-    }
-
-    get selectedVersion() : number {
-        return this._selectedVersion;
     }
 }
 
@@ -56,7 +51,7 @@ export default class PaintHistory {
         this.version = 0;
         this.inPrevState = false;
         this.states.push(new HistoryLayer());
-        this.states[0].addAction(new HistoryNode(null, null, null, null, null, null, null, null, image, null));
+        this.states[0].addAction(new HistoryNode(null, null, null, null, null, null, null, null, image, []));
     }
 
     pushAction(tool: ToolName, color: string, fill: boolean,
@@ -121,5 +116,24 @@ export default class PaintHistory {
 
     getImageData(version: number) : string {
         return this.states[this.currentLayer].currentVersion(version).imageData;
+    }
+
+    static loadObject(obj: any) : PaintHistory {
+        let image = obj.states[0].versions[0].imageData;
+        let hist = new PaintHistory(image);
+        obj.states.shift()
+        for(let layer of obj.states) {
+            let n = layer.versions[0];
+            hist.pushAction(n.tool, n.color, n.fill, n.weight, n.x, n.y,
+                            n.dx, n.dy, n.imageData, n.points);
+            if(layer.versions.length > 1) {
+                let m = layer.versions[1];
+                hist.states[hist.currentLayer].addAction(
+                    new HistoryNode(m.tool, m.color, m.fill, m.weight, m.x, m.y,
+                                    m.dx, m.dy, m.imageData, m.points));
+            }
+        }
+
+        return hist;
     }
 }

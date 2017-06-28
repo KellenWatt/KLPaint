@@ -53,14 +53,20 @@ define(["require", "exports", "./PaintHistory"], function (require, exports, Pai
             enumerable: true,
             configurable: true
         });
-        Layer.prototype.zoom = function () {
-        };
+        // zoom() : void {
+        //
+        // }
         Layer.prototype.finalize = function () {
             this._id = -1;
             this._name = null;
             this._canvas.parentNode.removeChild(this._canvas);
             this._canvas = null;
             this._context = null;
+        };
+        Layer.loadObject = function (obj, workspace) {
+            var layer = new Layer(workspace, obj._id);
+            layer._history = PaintHistory_1.default.loadObject(obj._history);
+            return layer;
         };
         return Layer;
     }());

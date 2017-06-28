@@ -49,9 +49,9 @@ export default class Layer {
         return this._history;
     }
 
-    zoom() : void {
-
-    }
+    // zoom() : void {
+    //
+    // }
 
     finalize() : void {
         this._id = -1;
@@ -59,6 +59,12 @@ export default class Layer {
         this._canvas.parentNode.removeChild(this._canvas);
         this._canvas = null;
         this._context = null;
+    }
+
+    static loadObject(obj: any, workspace: HTMLElement) : Layer {
+        let layer = new Layer(workspace, obj._id);
+        layer._history = PaintHistory.loadObject(obj._history);
+        return layer;
     }
 }
 
