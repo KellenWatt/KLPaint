@@ -3,3 +3,7 @@
 *.bak
 
 *.css
+
+assets/scripts/*.js
+assets/scripts/tools/*.js
+assets/scripts/old
