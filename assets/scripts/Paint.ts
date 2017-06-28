@@ -265,9 +265,14 @@ export default class Paint {
 
     render() : void {
         // redraw the image of each canvas
+        let img = new Image();
+
         for(let layer of this.layers) {
-            this.undo();
-            this.redo();
+            img.addEventListener("load", () => {
+                layer.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                layer.context.drawImage(img, 0, 0);
+            });
+            img.src = layer.history.getImageData(layer.history.version);
         }
     }
 
